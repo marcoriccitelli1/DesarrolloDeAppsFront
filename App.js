@@ -1,21 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
-import InputDemo from './src/components/InputDemo';
-import Counter from './src/components/Counter';
+import React from 'react';
+import { SafeAreaView, StatusBar } from 'react-native';
+import LoginScreen from './src/screens/LoginScreen';
+
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Counter />
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar barStyle="light-content" />
+      <LoginScreen />
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
