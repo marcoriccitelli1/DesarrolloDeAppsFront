@@ -18,18 +18,17 @@ const CustomTextField = ({ value, onChangeText, placeholder, secureTextEntry, ke
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: '#f6f6fa',
-    borderRadius: 10,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
     padding: 14,
     marginBottom: 12,
     width: '100%',
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#d1d1e0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    borderWidth: 0,
+    borderBottomWidth: 1,
+    borderColor: 'transparent',
+    borderBottomColor: '#bdbdbd',
+    shadowColor: 'transparent',
   },
 });
 
