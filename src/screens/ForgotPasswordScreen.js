@@ -22,7 +22,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
           onPress={() => {}}
           style={{ width: '70%', alignSelf: 'center' }}
         />
-        <TouchableOpacity onPress={() => navigation?.navigate('LoginScreen')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.loginLink}>¿Ya tienes cuenta? Iniciar sesión</Text>
         </TouchableOpacity>
       </View>

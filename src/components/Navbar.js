@@ -1,26 +1,45 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
-const Navbar = ({ onTabPress, activeTab }) => {
+const Navbar = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  // Determinar el tab activo según la ruta actual
+  const getActiveTab = () => {
+    switch (route.name) {
+      case 'OrdersAssigned':
+        return 'Pedidos';
+      case 'OrdersRecord':
+        return 'Historial';
+      case 'Profile':
+        return 'Perfil';
+      default:
+        return '';
+    }
+  };
+  const activeTab = getActiveTab();
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.item} onPress={() => onTabPress('Menu')}>
+      <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Home')}>
         <Icon name="home-outline" size={28} color={activeTab === 'Menu' ? '#6c4eb6' : '#222'} />
         <Text style={[styles.label, activeTab === 'Menu' && styles.activeLabel]}>Menú</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.item} onPress={() => onTabPress('Pedidos')}>
+      <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('OrdersAssigned')}>
         <Icon name="clock-outline" size={28} color={activeTab === 'Pedidos' ? '#6c4eb6' : '#222'} />
         <Text style={[styles.label, activeTab === 'Pedidos' && styles.activeLabel]}>Pedidos</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.qrButton} onPress={() => onTabPress('QR')}>
+      <TouchableOpacity style={styles.qrButton} onPress={() => {/* Aquí puedes poner navegación a QR si tienes esa pantalla */}}>
         <Image source={require('../../assets/qr.png')} style={styles.qrImage} />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.item} onPress={() => onTabPress('Historial')}>
+      <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('OrdersRecord')}>
         <Icon name="history" size={28} color={activeTab === 'Historial' ? '#6c4eb6' : '#222'} />
         <Text style={[styles.label, activeTab === 'Historial' && styles.activeLabel]}>Historial</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.item} onPress={() => onTabPress('Perfil')}>
+      <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Profile')}>
         <Icon name="account-outline" size={28} color={activeTab === 'Perfil' ? '#6c4eb6' : '#222'} />
         <Text style={[styles.label, activeTab === 'Perfil' && styles.activeLabel]}>Perfil</Text>
       </TouchableOpacity>

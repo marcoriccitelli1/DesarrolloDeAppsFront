@@ -11,7 +11,7 @@ import {
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -40,9 +40,14 @@ const LoginScreen = () => {
             secureTextEntry
           />
         </View>
-        <CustomButton title="Iniciar Sesión" onPress={() => {}} />
-        <CustomButton title="Crear Cuenta" onPress={() => {}} />
-        <Text style={styles.forgotPassword} onPress={() => Linking.openURL('#')}>
+        <CustomButton title="Iniciar Sesión" onPress={() => navigation.navigate('Home')} />
+        <CustomButton 
+          title="Crear Cuenta" 
+          onPress={() => navigation.navigate('Register')} 
+        />
+        <Text 
+          style={styles.forgotPassword} 
+          onPress={() => navigation.navigate('ForgotPassword')}>
           ¿Olvidaste tu contraseña?
         </Text>
       </View>

@@ -47,7 +47,7 @@ const RegisterScreen = ({ navigation }) => {
           keyboardType="phone-pad"
         />
         <CustomButton title="Registrarse" onPress={() => {}}  />
-        <TouchableOpacity onPress={() => navigation?.navigate('LoginScreen')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.loginLink}>¿Ya tenés cuenta? Iniciar sesión</Text>
         </TouchableOpacity>
       </View>
