@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,27 @@ import {
 } from 'react-native';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebaseConfig';
+import { AuthContext } from '../context/AuthContext';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useContext(AuthContext);
+
+  const handleLogin = async () => {
+    setError('');
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
+      await login(idToken);
+      // La navegación a Home la maneja el contexto y el AppNavigator
+    } catch (err) {
+      setError('Email o contraseña incorrectos');
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -40,7 +57,7 @@ const LoginScreen = ({ navigation }) => {
             secureTextEntry
           />
         </View>
-        <CustomButton title="Iniciar Sesión" onPress={() => navigation.navigate('Home')} />
+        <CustomButton title="Iniciar Sesión" onPress={handleLogin} />
         <CustomButton 
           title="Crear Cuenta" 
           onPress={() => navigation.navigate('Register')} 
@@ -50,6 +67,7 @@ const LoginScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('ForgotPassword')}>
           ¿Olvidaste tu contraseña?
         </Text>
+        {error ? <Text style={{ color: 'red', marginTop: 8 }}>{error}</Text> : null}
       </View>
     </KeyboardAvoidingView>
   );
