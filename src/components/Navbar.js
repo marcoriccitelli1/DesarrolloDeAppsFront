@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 const Navbar = () => {
@@ -25,22 +25,22 @@ const Navbar = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Home')}>
-        <Icon name="home-outline" size={28} color={activeTab === 'Menu' ? '#6c4eb6' : '#222'} />
+        <MaterialCommunityIcons name="home-outline" size={28} color={activeTab === 'Menu' ? '#6c4eb6' : '#222'} />
         <Text style={[styles.label, activeTab === 'Menu' && styles.activeLabel]}>Menú</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('OrdersAssigned')}>
-        <Icon name="clock-outline" size={28} color={activeTab === 'Pedidos' ? '#6c4eb6' : '#222'} />
+        <MaterialCommunityIcons name="clock-outline" size={28} color={activeTab === 'Pedidos' ? '#6c4eb6' : '#222'} />
         <Text style={[styles.label, activeTab === 'Pedidos' && styles.activeLabel]}>Pedidos</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.qrButton} onPress={() => {/* Aquí puedes poner navegación a QR si tienes esa pantalla */}}>
         <Image source={require('../../assets/qr.png')} style={styles.qrImage} />
       </TouchableOpacity>
       <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('OrdersRecord')}>
-        <Icon name="history" size={28} color={activeTab === 'Historial' ? '#6c4eb6' : '#222'} />
+        <MaterialCommunityIcons name="history" size={28} color={activeTab === 'Historial' ? '#6c4eb6' : '#222'} />
         <Text style={[styles.label, activeTab === 'Historial' && styles.activeLabel]}>Historial</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Profile')}>
-        <Icon name="account-outline" size={28} color={activeTab === 'Perfil' ? '#6c4eb6' : '#222'} />
+        <MaterialCommunityIcons name="account-outline" size={28} color={activeTab === 'Perfil' ? '#6c4eb6' : '#222'} />
         <Text style={[styles.label, activeTab === 'Perfil' && styles.activeLabel]}>Perfil</Text>
       </TouchableOpacity>
     </View>

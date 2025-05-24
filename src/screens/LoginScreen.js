@@ -10,25 +10,38 @@ import {
 } from 'react-native';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebaseConfig';
 import { AuthContext } from '../context/AuthContext';
+import { useAxios } from '../hooks/useAxios';
+
+console.log("LoginScreen: renderizando componente");
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useContext(AuthContext);
+  const axios = useAxios();
+
+  // Debug: verifica que login y axios no sean undefined
+  console.log("LoginScreen: login del contexto:", login);
+  console.log("LoginScreen: axios:", axios);
 
   const handleLogin = async () => {
     setError('');
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const idToken = await userCredential.user.getIdToken();
-      await login(idToken);
-      // La navegación a Home la maneja el contexto y el AppNavigator
+      console.log("LoginScreen: intentando login con", email, password);
+      const response = await axios.post('/auth/login', {
+        email,
+        password,
+      });
+      console.log("LoginScreen: respuesta del backend:", response.data);
+      const { token } = response.data;
+      await login(token);
     } catch (err) {
-      setError('Email o contraseña incorrectos');
+      console.log("LoginScreen: error en login:", err, err?.response?.data);
+      setError(
+        err.response?.data?.error || 'Email o contraseña incorrectos'
+      );
     }
   };
 
