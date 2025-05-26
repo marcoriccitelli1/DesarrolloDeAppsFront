@@ -31,8 +31,8 @@ export const useAxios = () => {
       (res) => res,
       async (err) => {
         if (err.response?.status === 401) {
-          await logout();              
-          navigation.reset({           
+          await logout();              // Actualiza estado global
+          navigation.reset({           // Borra historial y navega al login
             index: 0,
             routes: [{ name: 'Login' }],
           });
@@ -43,4 +43,4 @@ export const useAxios = () => {
   }, []);
 
   return axiosInstance.current;
-};
+}; 
