@@ -5,10 +5,8 @@ import Navbar from '../components/Navbar';
 const MainLayout = ({ children }) => {
   const [activeTab, setActiveTab] = useState('Menu');
 
-  // Aquí podrías manejar la navegación real según el tab
   const handleTabPress = (tab) => {
     setActiveTab(tab);
-    // Aquí podrías navegar según el tab si usas react-navigation
   };
 
   return (

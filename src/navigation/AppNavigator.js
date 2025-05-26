@@ -31,6 +31,7 @@ const AppNavigator = () => {
       }}
     >
       {isAuthenticated ? (
+        // Pantallas protegidas
         <>
           <Stack.Screen 
             name="Home" 
