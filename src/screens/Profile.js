@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { AuthContext } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 const Profile = () => {
   const nombre = 'Juan Pérez';
+  const { logout } = useContext(AuthContext);
+  const navigation = useNavigation();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -12,7 +28,7 @@ const Profile = () => {
           <Text style={styles.optionText}>Cambiar Contraseña</Text>
         </TouchableOpacity>
         <View style={styles.separator} />
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity style={styles.option} onPress={handleLogout}>
           <Text style={styles.logoutText}>Cerrar Sesión</Text>
         </TouchableOpacity>
       </View>

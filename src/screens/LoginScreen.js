@@ -6,7 +6,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Linking,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
@@ -46,43 +47,45 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <View style={styles.logoContainer}>
-        <Image source={require('../../assets/logonuevo.png')} style={styles.logo} />
-        <Text style={styles.title}>Iniciar Sesión</Text>
-      </View>
-      <View style={styles.card}>
-        <View style={styles.inputContainer}>
-          <CustomTextField
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Correo electrónico"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <CustomTextField
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Contraseña"
-            secureTextEntry
-          />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        <View style={styles.logoContainer}>
+          <Image source={require('../../assets/logonuevo.png')} style={styles.logo} />
+          <Text style={styles.title}>Iniciar Sesión</Text>
         </View>
-        <CustomButton title="Iniciar Sesión" onPress={handleLogin} />
-        <CustomButton 
-          title="Crear Cuenta" 
-          onPress={() => navigation.navigate('Register')} 
-        />
-        <Text 
-          style={styles.forgotPassword} 
-          onPress={() => navigation.navigate('ForgotPassword')}>
-          ¿Olvidaste tu contraseña?
-        </Text>
-        {error ? <Text style={{ color: 'red', marginTop: 8 }}>{error}</Text> : null}
-      </View>
-    </KeyboardAvoidingView>
+        <View style={styles.card}>
+          <View style={styles.inputContainer}>
+            <CustomTextField
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Correo electrónico"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <CustomTextField
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Contraseña"
+              secureTextEntry
+            />
+          </View>
+          <CustomButton title="Iniciar Sesión" onPress={handleLogin} />
+          <CustomButton 
+            title="Crear Cuenta" 
+            onPress={() => navigation.navigate('Register')} 
+          />
+          <Text 
+            style={styles.forgotPassword} 
+            onPress={() => navigation.navigate('ForgotPassword')}>
+            ¿Olvidaste tu contraseña?
+          </Text>
+          {error ? <Text style={{ color: 'red', marginTop: 8 }}>{error}</Text> : null}
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
