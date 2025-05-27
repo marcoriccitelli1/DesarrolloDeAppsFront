@@ -3,11 +3,18 @@ import {
   View, 
   Text, 
   StyleSheet,
+<<<<<<< HEAD
+=======
+  SafeAreaView,
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
   StatusBar,
   TouchableOpacity,
   Alert
 } from 'react-native';
+<<<<<<< HEAD
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+=======
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
@@ -22,7 +29,10 @@ const ChangePasswordScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
   const axios = useAxios();
+<<<<<<< HEAD
   const insets = useSafeAreaInsets();
+=======
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
 
   const validatePasswords = () => {
     setErrorMessage('');
@@ -77,16 +87,21 @@ const ChangePasswordScreen = () => {
   };
 
   return (
+<<<<<<< HEAD
     <View 
       style={[
         styles.mainContainer,
         { paddingTop: insets.top, paddingBottom: insets.bottom }
       ]}
     >
+=======
+    <View style={styles.mainContainer}>
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
       <StatusBar
         backgroundColor="#f9f6fa"
         barStyle="dark-content"
       />
+<<<<<<< HEAD
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity 
@@ -148,6 +163,72 @@ const ChangePasswordScreen = () => {
           disabled={loading}
         />
       </View>
+=======
+      <SafeAreaView style={styles.safeAreaTop} />
+      <SafeAreaView style={styles.safeAreaBottom}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="chevron-back" size={28} color="#6c4eb6" />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.title}>Cambiar Contraseña</Text>
+          <Text style={styles.subtitle}>
+            Introduce tu contraseña actual y la nueva contraseña
+          </Text>
+          <CustomTextField
+            value={currentPassword}
+            onChangeText={(text) => {
+              setCurrentPassword(text);
+              setErrorMessage('');
+            }}
+            placeholder="Contraseña actual"
+            secureTextEntry
+          />
+          <CustomTextField
+            value={newPassword}
+            onChangeText={(text) => {
+              setNewPassword(text);
+              setErrorMessage('');
+            }}
+            placeholder="Nueva contraseña"
+            secureTextEntry
+          />
+          <CustomTextField
+            value={confirmPassword}
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+              setErrorMessage('');
+            }}
+            placeholder="Confirmar nueva contraseña"
+            secureTextEntry
+          />
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : (
+            <Text style={styles.helpText}>
+              La contraseña debe tener al menos 8 caracteres.
+            </Text>
+          )}
+          <CustomButton
+            title="Cambiar contraseña"
+            onPress={handleChangePassword}
+            style={styles.changeButton}
+            disabled={loading}
+          />
+          <CustomButton
+            title="Cancelar"
+            onPress={() => navigation.goBack()}
+            style={styles.cancelButton}
+            textStyle={styles.cancelButtonText}
+            disabled={loading}
+          />
+        </View>
+      </SafeAreaView>
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
     </View>
   );
 };
@@ -157,10 +238,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f6fa'
   },
+<<<<<<< HEAD
+=======
+  safeAreaTop: {
+    flex: 0,
+    backgroundColor: '#f9f6fa'
+  },
+  safeAreaBottom: {
+    flex: 1,
+    backgroundColor: '#f9f6fa'
+  },
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
   container: {
     flex: 1,
     backgroundColor: '#f9f6fa',
     paddingHorizontal: 20,
+<<<<<<< HEAD
+=======
+    alignItems: 'center',
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
   },
   header: {
     width: '100%',

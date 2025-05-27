@@ -9,7 +9,10 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+<<<<<<< HEAD
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+=======
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { AuthContext } from '../context/AuthContext';
@@ -24,7 +27,10 @@ const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const axios = useAxios();
+<<<<<<< HEAD
   const insets = useSafeAreaInsets();
+=======
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
 
   console.log("LoginScreen: login del contexto:", login);
 
@@ -62,6 +68,7 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
+<<<<<<< HEAD
     <View 
       style={[
         styles.safeArea,
@@ -121,14 +128,71 @@ const LoginScreen = ({ navigation }) => {
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </View>
+=======
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        <View style={styles.logoContainer}>
+          <Image source={require('../../assets/logonuevo.png')} style={styles.logo} />
+          <Text style={styles.title}>Iniciar Sesión</Text>
+        </View>
+        <View style={styles.card}>
+          <View style={styles.inputContainer}>
+            <CustomTextField
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setError('');
+              }}
+              placeholder="Correo electrónico"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              editable={!loading}
+            />
+            <CustomTextField
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                setError('');
+              }}
+              placeholder="Contraseña"
+              secureTextEntry
+              editable={!loading}
+            />
+          </View>
+          <CustomButton 
+            title="Iniciar Sesión" 
+            onPress={handleLogin}
+            disabled={loading} 
+          />
+          <CustomButton 
+            title="Crear Cuenta" 
+            onPress={() => navigation.navigate('Register')}
+            disabled={loading}
+          />
+          <Text 
+            style={styles.forgotPassword} 
+            onPress={() => !loading && navigation.navigate('ForgotPassword')}>
+            ¿Olvidaste tu contraseña?
+          </Text>
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
   );
 };
 
 const styles = StyleSheet.create({
+<<<<<<< HEAD
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
   },
+=======
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
   container: {
     flex: 1,
     backgroundColor: '#fff',
