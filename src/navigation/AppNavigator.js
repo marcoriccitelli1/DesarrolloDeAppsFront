@@ -22,11 +22,13 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false,
-        contentStyle: {
-          backgroundColor: '#f9f6fa'
+        headerStyle: {
+          backgroundColor: '#f4511e',
         },
-        animation: 'slide_from_right'
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
       }}
     >
       {isAuthenticated ? (
@@ -35,22 +37,27 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="Home" 
             component={Home}
+            options={{ headerShown: false, animation: 'none' }}
           />
           <Stack.Screen 
             name="OrdersAssigned" 
             component={OrdersAssigned}
+            options={{ headerShown: false, animation: 'none' }}
           />
           <Stack.Screen 
             name="OrdersRecord" 
             component={OrdersRecord}
+            options={{ headerShown: false, animation: 'none' }}
           />
           <Stack.Screen 
             name="Profile" 
             component={Profile}
+            options={{ headerShown: false, animation: 'none' }}
           />
           <Stack.Screen 
             name="ChangePassword" 
             component={ChangePasswordScreen}
+            options={{ headerShown: false, animation: 'none' }}
           />
         </>
       ) : (
@@ -59,14 +66,17 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="Login" 
             component={LoginScreen}
+            options={{ headerShown: false }}
           />
           <Stack.Screen 
             name="Register" 
             component={RegisterScreen}
+            options={{ headerShown: false }}
           />
           <Stack.Screen 
             name="ForgotPassword" 
             component={ForgotPasswordScreen}
+            options={{ headerShown: false }}
           />
         </>
       )}

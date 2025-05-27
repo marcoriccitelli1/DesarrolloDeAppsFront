@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
@@ -22,6 +22,7 @@ const ChangePasswordScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
   const axios = useAxios();
+  const insets = useSafeAreaInsets();
 
   const validatePasswords = () => {
     setErrorMessage('');
@@ -76,7 +77,12 @@ const ChangePasswordScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.mainContainer} edges={['top', 'bottom']}>
+    <View 
+      style={[
+        styles.mainContainer,
+        { paddingTop: insets.top, paddingBottom: insets.bottom }
+      ]}
+    >
       <StatusBar
         backgroundColor="#f9f6fa"
         barStyle="dark-content"
@@ -142,7 +148,7 @@ const ChangePasswordScreen = () => {
           disabled={loading}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -155,7 +161,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f6fa',
     paddingHorizontal: 20,
-    alignItems: 'center',
   },
   header: {
     width: '100%',

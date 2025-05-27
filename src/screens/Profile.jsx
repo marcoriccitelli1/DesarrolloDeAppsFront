@@ -6,20 +6,19 @@ import {
   TouchableOpacity, 
   Alert, 
   StatusBar,
-  ActivityIndicator 
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAxios } from '../hooks/useAxios';
 
 const Profile = () => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState({ name: 'Cargando...', email: 'Cargando...' });
   const { logout } = useContext(AuthContext);
   const navigation = useNavigation();
   const axios = useAxios();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     fetchUserData();
@@ -32,8 +31,6 @@ const Profile = () => {
     } catch (error) {
       console.error('Error al obtener datos del usuario:', error);
       Alert.alert('Error', 'No se pudieron cargar los datos del usuario');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -62,21 +59,18 @@ const Profile = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <SafeAreaView style={[styles.mainContainer, styles.loadingContainer]} edges={['top', 'bottom']}>
-        <ActivityIndicator size="large" color="#6c4eb6" />
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={styles.mainContainer} edges={['top', 'bottom']}>
+    <View 
+      style={[
+        styles.mainContainer,
+        { paddingTop: insets.top }
+      ]}
+    >
       <StatusBar
         backgroundColor="#6c4eb6"
         barStyle="light-content"
       />
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <TouchableOpacity 
             style={styles.backButton} 
@@ -106,7 +100,7 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -114,10 +108,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: '#6c4eb6'
-  },
-  loadingContainer: {
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   container: {
     flex: 1,
