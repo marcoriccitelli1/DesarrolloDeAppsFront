@@ -8,6 +8,7 @@ import Home from '../screens/Home';
 import OrdersAssigned from '../screens/OrdersAssigned';
 import OrdersRecord from '../screens/OrdersRecord';
 import Profile from '../screens/Profile';
+import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,6 +52,11 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="Profile" 
             component={Profile}
+            options={{ headerShown: false, animation: 'none' }}
+          />
+          <Stack.Screen 
+            name="ChangePassword" 
+            component={ChangePasswordScreen}
             options={{ headerShown: false, animation: 'none' }}
           />
         </>
