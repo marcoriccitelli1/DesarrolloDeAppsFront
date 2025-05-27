@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -6,16 +6,36 @@ import {
   TouchableOpacity, 
   Alert, 
   SafeAreaView,
-  StatusBar 
+  StatusBar,
+  ActivityIndicator 
 } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAxios } from '../hooks/useAxios';
 
 const Profile = () => {
-  const nombre = 'Juan Pérez';
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { logout } = useContext(AuthContext);
   const navigation = useNavigation();
+  const axios = useAxios();
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get('/user/getUser');
+      setUserData(response.data);
+    } catch (error) {
+      console.error('Error al obtener datos del usuario:', error);
+      Alert.alert('Error', 'No se pudieron cargar los datos del usuario');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -42,6 +62,14 @@ const Profile = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={[styles.mainContainer, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#6c4eb6" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar
@@ -59,9 +87,15 @@ const Profile = () => {
               <Ionicons name="chevron-back" size={28} color="#fff" />
             </TouchableOpacity>
           </View>
-          <Text style={styles.name}>{nombre}</Text>
+          <Text style={styles.name}>{userData?.name || 'Usuario'}</Text>
+          <View style={styles.userInfo}>
+            <Text style={styles.userInfoText}>{userData?.email}</Text>
+          </View>
           <View style={styles.optionsContainer}>
-            <TouchableOpacity style={styles.option}>
+            <TouchableOpacity 
+              style={styles.option}
+              onPress={() => navigation.navigate('ChangePassword')}
+            >
               <Text style={styles.optionText}>Cambiar Contraseña</Text>
             </TouchableOpacity>
             <View style={styles.separator} />
@@ -79,6 +113,10 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: '#6c4eb6'
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   safeAreaTop: {
     flex: 0,
@@ -111,9 +149,18 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#6c4eb6',
-    marginBottom: 40,
+    marginBottom: 20,
     marginTop: 20,
     paddingHorizontal: 20,
+  },
+  userInfo: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  userInfoText: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 5,
   },
   optionsContainer: {
     marginTop: 10,

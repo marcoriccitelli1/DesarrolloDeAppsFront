@@ -41,7 +41,6 @@ const OrdersAssigned = () => {
                 <Text style={styles.text}>ID: {item.id}</Text>
                 {item.estante && <Text>Estante: {item.estante}</Text>}
                 {item.gondola && <Text>Góndola: {item.gondola}</Text>}
-                {/* Agrega aquí más campos si tu backend los devuelve */}
               </View>
             )}
           />

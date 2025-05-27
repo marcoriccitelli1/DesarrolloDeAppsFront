@@ -20,29 +20,42 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const axios = useAxios();
 
-  // Debug: verifica que login y axios no sean undefined
   console.log("LoginScreen: login del contexto:", login);
-  console.log("LoginScreen: axios:", axios);
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Por favor completa todos los campos');
+      return;
+    }
+    
     setError('');
+    setLoading(true);
+    
     try {
-      console.log("LoginScreen: intentando login con", email, password);
+      console.log("LoginScreen: intentando login con", email);
       const response = await axios.post('/auth/login', {
         email,
         password,
       });
+      
       console.log("LoginScreen: respuesta del backend:", response.data);
       const { token } = response.data;
       await login(token);
     } catch (err) {
-      console.log("LoginScreen: error en login:", err, err?.response?.data);
-      setError(
-        err.response?.data?.error || 'Email o contraseña incorrectos'
-      );
+      console.log("LoginScreen: error en login:", err?.response?.data);
+      if (err.response?.status === 401) {
+        setError('Email o contraseña incorrectos');
+      } else if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Error al intentar iniciar sesión');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,29 +73,42 @@ const LoginScreen = ({ navigation }) => {
           <View style={styles.inputContainer}>
             <CustomTextField
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => {
+                setEmail(text);
+                setError('');
+              }}
               placeholder="Correo electrónico"
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!loading}
             />
             <CustomTextField
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(text) => {
+                setPassword(text);
+                setError('');
+              }}
               placeholder="Contraseña"
               secureTextEntry
+              editable={!loading}
             />
           </View>
-          <CustomButton title="Iniciar Sesión" onPress={handleLogin} />
+          <CustomButton 
+            title="Iniciar Sesión" 
+            onPress={handleLogin}
+            disabled={loading} 
+          />
           <CustomButton 
             title="Crear Cuenta" 
-            onPress={() => navigation.navigate('Register')} 
+            onPress={() => navigation.navigate('Register')}
+            disabled={loading}
           />
           <Text 
             style={styles.forgotPassword} 
-            onPress={() => navigation.navigate('ForgotPassword')}>
+            onPress={() => !loading && navigation.navigate('ForgotPassword')}>
             ¿Olvidaste tu contraseña?
           </Text>
-          {error ? <Text style={{ color: 'red', marginTop: 8 }}>{error}</Text> : null}
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
@@ -134,6 +160,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textDecorationLine: 'underline',
     marginTop: 5,
+  },
+  errorText: {
+    color: '#ff3b30',
+    fontSize: 14,
+    marginTop: 10,
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });
 

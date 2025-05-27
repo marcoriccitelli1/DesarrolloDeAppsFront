@@ -30,9 +30,9 @@ export const useAxios = () => {
     instance.interceptors.response.use(
       (res) => res,
       async (err) => {
-        if (err.response?.status === 401) {
-          await logout();              // Actualiza estado global
-          navigation.reset({           // Borra historial y navega al login
+        if (err.response?.status === 401 && !err.config.url.includes('/auth/login')) {
+          await logout();             
+          navigation.reset({           
             index: 0,
             routes: [{ name: 'Login' }],
           });
