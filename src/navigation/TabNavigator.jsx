@@ -92,25 +92,25 @@ const TabNavigator = () => {
 
 const styles = StyleSheet.create({
   qrButton: {
-    width: 60,
-    height: 60,
+    width: 76,
+    height: 76,
     backgroundColor: '#6c4eb6',
-    borderRadius: 30,
+    borderRadius: 38,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
-    elevation: 4,
+    marginBottom: 24,
+    elevation: 6,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
   },
   qrIcon: {
-    width: 32,
-    height: 32,
+    width: 60,
+    height: 60,
     tintColor: '#fff',
   },
 });
