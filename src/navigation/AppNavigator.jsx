@@ -4,11 +4,8 @@ import { AuthContext } from '../context/AuthContext';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
-import Home from '../screens/Home';
-import OrdersAssigned from '../screens/OrdersAssigned';
-import OrdersRecord from '../screens/OrdersRecord';
-import Profile from '../screens/Profile';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
+import TabNavigator from './TabNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,42 +19,23 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: {
-          backgroundColor: '#f4511e',
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: '#f9f6fa'
         },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
+        animation: 'slide_from_right'
       }}
     >
       {isAuthenticated ? (
         // Pantallas protegidas
         <>
           <Stack.Screen 
-            name="Home" 
-            component={Home}
-            options={{ headerShown: false, animation: 'none' }}
-          />
-          <Stack.Screen 
-            name="OrdersAssigned" 
-            component={OrdersAssigned}
-            options={{ headerShown: false, animation: 'none' }}
-          />
-          <Stack.Screen 
-            name="OrdersRecord" 
-            component={OrdersRecord}
-            options={{ headerShown: false, animation: 'none' }}
-          />
-          <Stack.Screen 
-            name="Profile" 
-            component={Profile}
-            options={{ headerShown: false, animation: 'none' }}
+            name="MainTabs" 
+            component={TabNavigator}
           />
           <Stack.Screen 
             name="ChangePassword" 
             component={ChangePasswordScreen}
-            options={{ headerShown: false, animation: 'none' }}
           />
         </>
       ) : (
@@ -66,17 +44,14 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="Login" 
             component={LoginScreen}
-            options={{ headerShown: false }}
           />
           <Stack.Screen 
             name="Register" 
             component={RegisterScreen}
-            options={{ headerShown: false }}
           />
           <Stack.Screen 
             name="ForgotPassword" 
             component={ForgotPasswordScreen}
-            options={{ headerShown: false }}
           />
         </>
       )}

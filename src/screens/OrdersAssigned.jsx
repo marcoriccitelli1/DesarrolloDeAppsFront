@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import MainLayout from '../layouts/MainLayout';
 import { useAxios } from '../hooks/useAxios';
+import { useNavigation } from '@react-navigation/native';
 
 const OrdersAssigned = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const axios = useAxios();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      gestureEnabled: false
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -24,29 +31,27 @@ const OrdersAssigned = () => {
   }, [axios]);
 
   return (
-    <MainLayout>
-      <View style={styles.center}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : error ? (
-          <Text style={styles.error}>{error}</Text>
-        ) : orders.length === 0 ? (
-          <Text style={styles.text}>No hay órdenes asignadas.</Text>
-        ) : (
-          <FlatList
-            data={orders}
-            keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
-            renderItem={({ item }) => (
-              <View style={styles.orderItem}>
-                <Text style={styles.text}>ID: {item.id}</Text>
-                {item.estante && <Text>Estante: {item.estante}</Text>}
-                {item.gondola && <Text>Góndola: {item.gondola}</Text>}
-              </View>
-            )}
-          />
-        )}
-      </View>
-    </MainLayout>
+    <View style={styles.center}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : error ? (
+        <Text style={styles.error}>{error}</Text>
+      ) : orders.length === 0 ? (
+        <Text style={styles.text}>No hay órdenes asignadas.</Text>
+      ) : (
+        <FlatList
+          data={orders}
+          keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+          renderItem={({ item }) => (
+            <View style={styles.orderItem}>
+              <Text style={styles.text}>ID: {item.id}</Text>
+              {item.estante && <Text>Estante: {item.estante}</Text>}
+              {item.gondola && <Text>Góndola: {item.gondola}</Text>}
+            </View>
+          )}
+        />
+      )}
+    </View>
   );
 };
 
@@ -56,6 +61,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
+    backgroundColor: '#f9f6fa',
+    padding: 16,
   },
   text: {
     fontSize: 20,
@@ -72,6 +79,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
 });
 

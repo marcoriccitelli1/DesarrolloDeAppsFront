@@ -1,14 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import MainLayout from '../layouts/MainLayout';
 
 const Home = () => {
   return (
-    <MainLayout>
-      <View style={styles.center}>
-        <Text style={styles.text}>¡Bienvenido a la Home!</Text>
-      </View>
-    </MainLayout>
+    <View style={styles.center}>
+      <Text style={styles.text}>¡Bienvenido a la Home!</Text>
+    </View>
   );
 };
 
@@ -17,6 +14,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f9f6fa',
   },
   text: {
     fontSize: 20,

@@ -9,7 +9,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { AuthContext } from '../context/AuthContext';
@@ -24,6 +24,7 @@ const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const axios = useAxios();
+  const insets = useSafeAreaInsets();
 
   console.log("LoginScreen: login del contexto:", login);
 
@@ -61,7 +62,12 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <View 
+      style={[
+        styles.safeArea,
+        { paddingTop: insets.top }
+      ]}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -71,7 +77,7 @@ const LoginScreen = ({ navigation }) => {
             <Image source={require('../../assets/logonuevo.png')} style={styles.logo} />
             <Text style={styles.title}>Iniciar Sesión</Text>
           </View>
-          <View style={styles.card}>
+          <View style={[styles.card, { marginBottom: insets.bottom + 20 }]}>
             <View style={styles.inputContainer}>
               <CustomTextField
                 value={email}
@@ -114,7 +120,7 @@ const LoginScreen = ({ navigation }) => {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </SafeAreaView>
+    </View>
   );
 };
 
