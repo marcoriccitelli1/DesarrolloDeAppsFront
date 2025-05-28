@@ -6,6 +6,7 @@ import {
   TouchableOpacity, 
   Alert, 
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';

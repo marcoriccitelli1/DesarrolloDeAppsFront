@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react';
 import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -37,5 +38,6 @@ export default function App() {
         <AppContent />
       </AuthProvider>
     </SafeAreaProvider>
+
   );
 }

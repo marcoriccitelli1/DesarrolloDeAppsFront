@@ -3,6 +3,7 @@ import {
   View, 
   Text, 
   StyleSheet,
+  SafeAreaView,
   StatusBar,
   TouchableOpacity,
   Alert
@@ -154,6 +155,15 @@ const ChangePasswordScreen = () => {
 
 const styles = StyleSheet.create({
   mainContainer: {
+    flex: 1,
+    backgroundColor: '#f9f6fa'
+  },
+
+  safeAreaTop: {
+    flex: 0,
+    backgroundColor: '#f9f6fa'
+  },
+  safeAreaBottom: {
     flex: 1,
     backgroundColor: '#f9f6fa'
   },

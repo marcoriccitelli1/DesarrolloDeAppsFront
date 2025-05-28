@@ -78,6 +78,7 @@ const LoginScreen = ({ navigation }) => {
             <Text style={styles.title}>Iniciar Sesión</Text>
           </View>
           <View style={[styles.card, { marginBottom: insets.bottom + 20 }]}>
+          <View style={[styles.card, { marginBottom: insets.bottom + 20 }]}>
             <View style={styles.inputContainer}>
               <CustomTextField
                 value={email}
@@ -125,10 +126,13 @@ const LoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+<<<<<<< HEAD
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
   },
+=======
+>>>>>>> 8824e2fe37ac011cbda979ff7495a9e2b6cecc6e
   container: {
     flex: 1,
     backgroundColor: '#fff',
