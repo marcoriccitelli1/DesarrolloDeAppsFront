@@ -161,7 +161,8 @@ const OrdersRecord = () => {
           <Text style={styles.headerTitle}>Historial de Pedidos</Text>
         </View>
         <ScrollView
-          contentContainerStyle={styles.center}
+          style={styles.center}
+          contentContainerStyle={styles.scrollContent}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -210,6 +211,10 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     backgroundColor: '#f9f6fa',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   loadingContainer: {
     alignItems: 'center',

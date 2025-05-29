@@ -5,12 +5,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 const UnassignedOrderCard = ({ order }) => {
   return (
     <View style={styles.card}>
-      {/* Header violeta claro con ícono y número de pedido */}
       <View style={styles.header}>
         <MaterialCommunityIcons name="filter-variant" size={22} color="#fff" style={styles.headerIcon} />
         <Text style={styles.headerText}>Pedido #{order.id}</Text>
       </View>
-      {/* Info estante y góndola */}
       <View style={styles.infoContent}>
         <View style={styles.infoRow}>
           <MaterialCommunityIcons name="eye-outline" size={20} color="#a085ff" style={styles.infoIcon} />
@@ -41,12 +39,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 6,
+    minHeight: 120,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#a085ff',
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
@@ -62,7 +61,7 @@ const styles = StyleSheet.create({
   },
   infoContent: {
     paddingHorizontal: 18,
-    paddingVertical: 12,
+    paddingVertical: 16,
     backgroundColor: '#faf8ff',
   },
   infoRow: {

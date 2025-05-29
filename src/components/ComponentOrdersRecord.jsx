@@ -49,11 +49,9 @@ const ComponentOrdersRecord = ({ order }) => {
   const colorEstado = getEstadoColor(order.estado);
   return (
     <View style={styles.card}>
-      {/* Header con estado */}
-      <View style={[styles.header, { backgroundColor: colorEstado }]}> 
-        <Text style={styles.estado}>{order.estado || 'Estado'}</Text>
+      <View style={[styles.header, { backgroundColor: colorEstado }]}>
+        <Text style={styles.estado}>{order.estado || 'Sin estado'}</Text>
       </View>
-      {/* Contenido con íconos y datos */}
       <View style={styles.body}>
         <View style={styles.row}>
           <MaterialCommunityIcons name="clock-outline" size={20} color="#7c4dff" style={styles.icon} />
@@ -61,17 +59,21 @@ const ComponentOrdersRecord = ({ order }) => {
             {calcularHorasYMinutos(order.horaInicio, order.horaFin)}
           </Text>
         </View>
+
         <View style={styles.row}>
           <MaterialCommunityIcons name="account-outline" size={20} color="#7c4dff" style={styles.icon} />
-          <Text style={styles.infoText}>{order.cliente || 'Sin cliente'}</Text>
+          <Text style={styles.infoText}>
+            {order.cliente || 'Sin cliente'}
+          </Text>
         </View>
+
         <View style={styles.row}>
           <MaterialCommunityIcons name="map-marker-outline" size={20} color="#7c4dff" style={styles.icon} />
           <Text style={styles.infoText}>
-            {order.ubicacion
-              ? order.ubicacion
-              : (order.estante && order.gondola
-                ? `Estante: ${order.estante} - Góndola: ${order.gondola}`
+            {order.destino
+              ? `Destino: ${order.destino}`
+              : (order.ubicacion
+                ? order.ubicacion
                 : 'Sin ubicación')}
           </Text>
         </View>
