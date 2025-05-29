@@ -10,7 +10,7 @@ import TabNavigator from './TabNavigator';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, logout } = useContext(AuthContext);
 
   if (isAuthenticated === null) {
     return null;

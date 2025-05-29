@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, NetInfo, RefreshControl, ScrollView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar, RefreshControl, ScrollView } from 'react-native';
 import { useAxios } from '../hooks/useAxios';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -64,16 +64,16 @@ const OrdersAssigned = () => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
+    setError(null);
+    setOrders([]);
     fetchOrders();
   }, []);
 
   useEffect(() => {
-    // Función para verificar la conexión
     const checkConnection = async () => {
       try {
         const response = await axios.get('/health');
         if (response.status === 200) {
-          // Si la conexión se restableció, recargamos los datos
           if (!isConnected) {
             setIsConnected(true);
             fetchOrders();
@@ -87,13 +87,8 @@ const OrdersAssigned = () => {
       }
     };
 
-    // Verificar la conexión cada 3 segundos
     const intervalId = setInterval(checkConnection, 3000);
-
-    // Cargar datos iniciales
     fetchOrders();
-
-    // Limpiar el intervalo cuando el componente se desmonte
     return () => clearInterval(intervalId);
   }, [axios, isConnected]);
 
@@ -108,35 +103,37 @@ const OrdersAssigned = () => {
 
     if (error) {
       return (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorIcon}>⚠️</Text>
-          <Text style={styles.error}>{error}</Text>
+        <View style={styles.fullScreenCenter}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorIcon}>⚠️</Text>
+            <Text style={styles.error}>{error}</Text>
+          </View>
         </View>
       );
     }
 
-    if (orders.length === 0) {
+    if (!loading && orders.length === 0) {
       return (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>📦</Text>
-          <Text style={styles.text}>Todavía no hay pedidos asignados</Text>
-          <Text style={styles.subText}>Los pedidos aparecerán aquí cuando sean asignados a tu cuenta</Text>
+        <View style={styles.fullScreenCenter}>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyIcon}>📦</Text>
+            <Text style={styles.text}>Todavía no hay pedidos asignados</Text>
+            <Text style={styles.subText}>Los pedidos aparecerán aquí cuando sean asignados a tu cuenta</Text>
+          </View>
         </View>
       );
     }
 
     return (
-      <FlatList
-        data={orders}
-        keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
-        renderItem={({ item }) => (
-          <View style={styles.orderItem}>
+      <View style={{ flex: 1 }}>
+        {orders.map((item) => (
+          <View key={item.id?.toString() || Math.random().toString()} style={styles.orderItem}>
             <Text style={styles.text}>ID: {item.id}</Text>
             {item.estante && <Text>Estante: {item.estante}</Text>}
             {item.gondola && <Text>Góndola: {item.gondola}</Text>}
           </View>
-        )}
-      />
+        ))}
+      </View>
     );
   };
 
@@ -155,9 +152,8 @@ const OrdersAssigned = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Pedidos Asignados</Text>
         </View>
-        <ScrollView 
-          style={styles.center}
-          contentContainerStyle={styles.scrollContent}
+        <ScrollView
+          contentContainerStyle={styles.center}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -207,17 +203,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f6fa',
   },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
   loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 200,
+    paddingTop: 20,
   },
   text: {
     fontSize: 18,
@@ -277,6 +265,17 @@ const styles = StyleSheet.create({
   emptyIcon: {
     fontSize: 40,
     marginBottom: 16,
+  },
+  listContainer: {
+    paddingBottom: 32,
+    paddingTop: 16,
+    width: '100%',
+  },
+  fullScreenCenter: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9f6fa',
   },
   orderItem: {
     padding: 16,

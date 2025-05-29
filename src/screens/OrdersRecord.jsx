@@ -26,11 +26,11 @@ const OrdersRecord = () => {
     try {
       setLoading(true);
       setError(null);
-      setOrders([]);
       const token = await getToken();
       if (!token) {
         setError('No autenticado');
         setLoading(false);
+        setOrders([]);
         return;
       }
       const response = await axios.get('/orders/getOrdersRecord', {
@@ -48,7 +48,6 @@ const OrdersRecord = () => {
       }
       setIsConnected(true);
     } catch (err) {
-      setOrders([]);
       if (err.message === 'Network Error') {
         setError('No hay conexión a internet. Por favor, verifica tu conexión.');
         setIsConnected(false);
@@ -105,21 +104,6 @@ const OrdersRecord = () => {
     return () => clearInterval(intervalId);
   }, [axios, isConnected]);
 
-  // Efecto para limpiar el mensaje de error después de 3 segundos
-  useEffect(() => {
-    let timeoutId;
-    if (error) {
-      timeoutId = setTimeout(() => {
-        setError(null);
-      }, 3000);
-    }
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [error]);
-
   const renderContent = () => {
     if (loading && !refreshing) {
       return (
@@ -140,7 +124,7 @@ const OrdersRecord = () => {
       );
     }
 
-    if (orders.length === 0) {
+    if (!loading && orders.length === 0) {
       return (
         <View style={styles.fullScreenCenter}>
           <View style={styles.emptyContainer}>
@@ -153,21 +137,11 @@ const OrdersRecord = () => {
     }
 
     return (
-      <FlatList
-        data={orders}
-        keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
-        renderItem={({ item }) => <ComponentOrdersRecord order={item} />}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#6c4eb6']}
-            tintColor="#6c4eb6"
-          />
-        }
-      />
+      <View style={{ flex: 1 }}>
+        {orders.map((item) => (
+          <ComponentOrdersRecord key={item.id?.toString() || Math.random().toString()} order={item} />
+        ))}
+      </View>
     );
   };
 
@@ -186,9 +160,8 @@ const OrdersRecord = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Historial de Pedidos</Text>
         </View>
-        <ScrollView 
-          style={styles.center}
-          contentContainerStyle={styles.scrollContent}
+        <ScrollView
+          contentContainerStyle={styles.center}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -238,22 +211,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f6fa',
   },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
   loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 200,
+    paddingTop: 20,
   },
   text: {
-    fontSize: 20,
-    color: '#333',
-    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#6c4eb6',
+    fontWeight: '600',
+    marginBottom: 8,
   },
   subText: {
     fontSize: 14,
@@ -263,9 +229,12 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   error: {
-    color: 'red',
+    color: '#E74C3C',
     fontSize: 16,
-    marginTop: 10,
+    marginTop: 12,
+    textAlign: 'center',
+    lineHeight: 22,
+    fontWeight: '500',
   },
   errorContainer: {
     alignItems: 'center',

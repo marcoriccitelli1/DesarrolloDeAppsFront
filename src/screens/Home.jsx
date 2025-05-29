@@ -67,6 +67,8 @@ const Home = () => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
+    setError(null);
+    setOrders([]);
     fetchUnassignedOrders();
   }, []);
 
@@ -114,7 +116,7 @@ const Home = () => {
       );
     }
 
-    if (orders.length === 0) {
+    if (!loading && orders.length === 0) {
       return (
         <View style={styles.fullScreenCenter}>
           <View style={styles.emptyContainer}>

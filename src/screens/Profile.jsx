@@ -152,9 +152,17 @@ const Profile = () => {
 
     return (
       <View style={styles.contentContainer}>
-        <Text style={styles.name}>{userData?.name || 'Usuario'}</Text>
+        <View style={styles.optionContent}>
+          <Ionicons name="person-outline" size={24} color="#6c4eb6" />
+          <Text style={styles.name}>{userData?.name || 'Usuario'}</Text>
+        </View>
         <View style={styles.userInfo}>
-          <Text style={styles.userInfoText}>{userData?.email}</Text>
+          <TouchableOpacity style={styles.option} onPress={() => {}}>
+            <View style={styles.optionContent}>
+              <Ionicons name="mail-outline" size={24} color="#6c4eb6" />
+              <Text style={styles.optionText}>{userData?.email || 'Email'}</Text>
+            </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.optionsContainer}>
           <TouchableOpacity 
@@ -165,11 +173,17 @@ const Profile = () => {
               console.log('Navegación completada');
             }}
           >
-            <Text style={styles.optionText}>Cambiar Contraseña</Text>
+            <View style={styles.optionContent}>
+              <Ionicons name="key-outline" size={24} color="#6c4eb6" />
+              <Text style={styles.optionText}>Cambiar Contraseña</Text>
+            </View>
           </TouchableOpacity>
           <View style={styles.separator} />
           <TouchableOpacity style={styles.option} onPress={handleLogout}>
-            <Text style={styles.logoutText}>Cerrar Sesión</Text>
+            <View style={styles.optionContent}>
+              <Ionicons name="log-out-outline" size={24} color="#E74C3C" />
+              <Text style={[styles.optionText, styles.logoutText]}>Cerrar Sesión</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -261,26 +275,19 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  name: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#6c4eb6',
-    marginBottom: 20,
-    marginTop: 20,
-  },
   userInfo: {
     marginBottom: 20,
-  },
-  userInfoText: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
   },
   optionsContainer: {
     marginTop: 10,
   },
   option: {
     paddingVertical: 10,
+  },
+  optionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   optionText: {
     fontSize: 16,
@@ -292,8 +299,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   logoutText: {
-    fontSize: 16,
-    color: 'red',
+    color: '#E74C3C',
   },
   loadingContainer: {
     flex: 1,
@@ -332,6 +338,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f9f6fa',
+  },
+  name: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#6c4eb6',
+    marginBottom: 20,
+    marginTop: 20,
   },
 });
 
