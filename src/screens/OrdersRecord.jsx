@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar, RefreshControl } from 'react-native';
 import { useAxios } from '../hooks/useAxios';
 import { getToken } from '../utils/tokenStorage';
 import ComponentOrdersRecord from '../components/ComponentOrdersRecord';
@@ -10,6 +10,8 @@ const OrdersRecord = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isConnected, setIsConnected] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const axios = useAxios();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -20,31 +22,151 @@ const OrdersRecord = () => {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
+  const fetchOrders = async () => {
+    try {
       setLoading(true);
       setError(null);
-      try {
-        const token = await getToken();
-        if (!token) {
-          setError('No autenticado.');
-          setLoading(false);
-          return;
-        }
-        const response = await axios.get('/orders/getOrdersRecord', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setOrders(response.data || []);
-      } catch (err) {
-        setError('No se pudieron cargar los pedidos históricos.');
-      } finally {
+      const token = await getToken();
+      if (!token) {
+        setError('No autenticado');
         setLoading(false);
+        return;
+      }
+      const response = await axios.get('/orders/getOrdersRecord', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (Array.isArray(response.data)) {
+        setOrders(response.data);
+      } else if (Array.isArray(response.data.orders)) {
+        setOrders(response.data.orders);
+      } else {
+        setOrders([]);
+      }
+      setIsConnected(true);
+    } catch (err) {
+      if (err.message === 'Network Error') {
+        setError('No hay conexión a internet. Por favor, verifica tu conexión.');
+        setIsConnected(false);
+      } else if (err.response) {
+        switch (err.response.status) {
+          case 401:
+            setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            break;
+          case 403:
+            setError('No tienes permisos para ver el historial de pedidos.');
+            break;
+          case 500:
+            setError('Error en el servidor. Por favor, intenta más tarde.');
+            break;
+          default:
+            setError('Error al cargar el historial de pedidos');
+        }
+      } else {
+        setError('Error al cargar el historial de pedidos');
+      }
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setError(null);
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const response = await axios.get('/health');
+        if (response.status === 200) {
+          if (!isConnected) {
+            setIsConnected(true);
+            fetchOrders();
+          }
+        }
+      } catch (err) {
+        if (err.message === 'Network Error') {
+          setError('No hay conexión a internet. Por favor, verifica tu conexión.');
+          setIsConnected(false);
+        }
       }
     };
+
+    const intervalId = setInterval(checkConnection, 3000);
     fetchOrders();
-  }, [axios]);
+    return () => clearInterval(intervalId);
+  }, [axios, isConnected]);
+
+  // Efecto para limpiar el mensaje de error después de 3 segundos
+  useEffect(() => {
+    let timeoutId;
+    if (error) {
+      timeoutId = setTimeout(() => {
+        setError(null);
+      }, 3000);
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [error]);
+
+  const renderContent = () => {
+    if (loading || refreshing) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6c4eb6" />
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={styles.fullScreenCenter}>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorIcon}>⚠️</Text>
+            <Text style={styles.error}>{error}</Text>
+          </View>
+        </View>
+      );
+    }
+
+    if (orders.length === 0) {
+      return (
+        <View style={styles.fullScreenCenter}>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyIcon}>📦</Text>
+            <Text style={styles.text}>No hay pedidos históricos</Text>
+            <Text style={styles.subText}>Los pedidos aparecerán aquí cuando estén disponibles</Text>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <FlatList
+        data={orders}
+        keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+        renderItem={({ item }) => <ComponentOrdersRecord order={item} />}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#6c4eb6']}
+            tintColor="#6c4eb6"
+          />
+        }
+      />
+    );
+  };
 
   return (
     <View 
@@ -57,26 +179,12 @@ const OrdersRecord = () => {
         backgroundColor="#6c4eb6"
         barStyle="light-content"
       />
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Historial de Pedidos</Text>
         </View>
         <View style={styles.center}>
-          {loading ? (
-            <ActivityIndicator size="large" color="#6C4BA2" />
-          ) : error ? (
-            <Text style={styles.error}>{error}</Text>
-          ) : orders.length === 0 ? (
-            <Text style={styles.text}>No hay pedidos históricos.</Text>
-          ) : (
-            <FlatList
-              data={orders}
-              keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
-              renderItem={({ item }) => <ComponentOrdersRecord order={item} />}
-              contentContainerStyle={{ paddingBottom: 32, paddingTop: 16 }}
-              showsVerticalScrollIndicator={false}
-            />
-          )}
+          {renderContent()}
         </View>
       </View>
     </View>
@@ -114,22 +222,81 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    justifyContent: 'flex-start',
-    width: '100%',
-    paddingBottom: 40,
-    backgroundColor: '#f5f5f5',
-    paddingTop: 32,
-    paddingHorizontal: 16,
+    backgroundColor: '#f9f6fa',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingTop: 20,
   },
   text: {
-    fontSize: 20,
-    color: '#333',
-    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#6c4eb6',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  subText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+    textAlign: 'center',
+    lineHeight: 20,
   },
   error: {
-    color: 'red',
+    color: '#E74C3C',
     fontSize: 16,
-    marginTop: 10,
+    marginTop: 12,
+    textAlign: 'center',
+    lineHeight: 22,
+    fontWeight: '500',
+  },
+  errorContainer: {
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#FDF2F1',
+    borderRadius: 12,
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  errorIcon: {
+    fontSize: 40,
+    marginBottom: 16,
+  },
+  emptyIcon: {
+    fontSize: 40,
+    marginBottom: 16,
+  },
+  listContainer: {
+    paddingBottom: 32,
+    paddingTop: 16,
+    width: '100%',
+  },
+  fullScreenCenter: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9f6fa',
   },
 });
 
