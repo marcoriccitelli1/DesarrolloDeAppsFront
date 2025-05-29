@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, NetInfo, RefreshControl, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, NetInfo, RefreshControl, ScrollView, StatusBar } from 'react-native';
 import { useAxios } from '../hooks/useAxios';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const OrdersAssigned = () => {
   const [orders, setOrders] = useState([]);
@@ -11,6 +12,7 @@ const OrdersAssigned = () => {
   const [refreshing, setRefreshing] = useState(false);
   const axios = useAxios();
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     navigation.setOptions({
@@ -139,27 +141,71 @@ const OrdersAssigned = () => {
   };
 
   return (
-    <ScrollView 
-      style={styles.center}
-      contentContainerStyle={styles.scrollContent}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={['#6A1B9A']}
-          tintColor="#6A1B9A"
-        />
-      }
+    <View 
+      style={[
+        styles.mainContainer,
+        { paddingTop: insets.top }
+      ]}
     >
-      {renderContent()}
-    </ScrollView>
+      <StatusBar
+        backgroundColor="#6c4eb6"
+        barStyle="light-content"
+      />
+      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Pedidos Asignados</Text>
+        </View>
+        <ScrollView 
+          style={styles.center}
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#6c4eb6']}
+              tintColor="#6c4eb6"
+            />
+          }
+        >
+          {renderContent()}
+        </ScrollView>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#6c4eb6'
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#f9f6fa',
+  },
+  header: {
+    height: 60,
+    backgroundColor: '#6c4eb6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 15,
+    elevation: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    borderBottomWidth: 0,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
   center: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f9f6fa',
   },
   scrollContent: {
     flexGrow: 1,
@@ -175,13 +221,13 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
-    color: '#2C3E50',
+    color: '#6c4eb6',
     fontWeight: '600',
     marginBottom: 8,
   },
   subText: {
     fontSize: 14,
-    color: '#7F8C8D',
+    color: '#666',
     marginTop: 4,
     textAlign: 'center',
     lineHeight: 20,

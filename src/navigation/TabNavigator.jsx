@@ -52,7 +52,7 @@ const TabNavigator = () => {
         name="OrdersAssignedTab"
         component={OrdersAssigned}
         options={{
-          tabBarLabel: 'Órdenes',
+          tabBarLabel: 'Pedidos',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="list-outline" size={size} color={color} />
           ),

@@ -79,6 +79,7 @@ const Profile = () => {
           >
             <Ionicons name="chevron-back" size={28} color="#fff" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Tu Perfil</Text>
         </View>
         <Text style={styles.name}>{userData?.name || 'Usuario'}</Text>
         <View style={styles.userInfo}>
@@ -119,15 +120,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#6c4eb6',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 15,
-    elevation: 4,
+    elevation: 0,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    borderBottomWidth: 0,
   },
   backButton: {
     padding: 5,
+    position: 'absolute',
+    left: 15,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    letterSpacing: 0.5,
   },
   name: {
     fontSize: 22,

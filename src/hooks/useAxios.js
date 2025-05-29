@@ -10,7 +10,7 @@ export const useAxios = () => {
   const navigation = useNavigation();
   const axiosInstance = useRef(axios.create({ 
     baseURL: config.API_BASE_URL,
-    timeout: 10000,
+    timeout: 30000,
     headers: {
       'Content-Type': 'application/json',
     }
@@ -30,17 +30,25 @@ export const useAxios = () => {
     instance.interceptors.response.use(
       (res) => res,
       async (err) => {
-        if (err.response?.status === 401 && !err.config.url.includes('/auth/login')) {
-          await logout();             
-          navigation.reset({           
-            index: 0,
-            routes: [{ name: 'Login' }],
+        if (err.message === 'Network Error' || err.code === 'ECONNABORTED') {
+          return Promise.reject({
+            response: {
+              status: 500,
+              data: { message: 'Error de conexión. Por favor, verifica tu conexión a internet.' }
+            }
           });
+        }
+        
+        if (err.response?.status === 401 && !err.config.url.includes('/auth/login')) {
+          await logout();
+          if (navigation) {
+            navigation.navigate('Login');
+          }
         }
         return Promise.reject(err);
       }
     );
-  }, []);
+  }, [navigation]);
 
   return axiosInstance.current;
 }; 
