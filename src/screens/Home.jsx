@@ -94,13 +94,14 @@ const Home = () => {
   }, [axios, isConnected]);
 
   const renderContent = () => {
-    if (loading || refreshing) {
+    if (loading && !refreshing) {
       return (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6c4eb6" />
         </View>
       );
     }
+    
 
     if (error) {
       return (

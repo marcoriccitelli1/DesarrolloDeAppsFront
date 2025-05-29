@@ -131,7 +131,7 @@ const Profile = () => {
   };
 
   const renderContent = () => {
-    if (loading || refreshing) {
+    if (loading && !refreshing) {
       return (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6c4eb6" />

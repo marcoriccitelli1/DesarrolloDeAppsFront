@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar, RefreshControl, ScrollView } from 'react-native';
 import { useAxios } from '../hooks/useAxios';
 import { getToken } from '../utils/tokenStorage';
 import ComponentOrdersRecord from '../components/ComponentOrdersRecord';
@@ -26,6 +26,7 @@ const OrdersRecord = () => {
     try {
       setLoading(true);
       setError(null);
+      setOrders([]);
       const token = await getToken();
       if (!token) {
         setError('No autenticado');
@@ -47,6 +48,7 @@ const OrdersRecord = () => {
       }
       setIsConnected(true);
     } catch (err) {
+      setOrders([]);
       if (err.message === 'Network Error') {
         setError('No hay conexión a internet. Por favor, verifica tu conexión.');
         setIsConnected(false);
@@ -76,6 +78,7 @@ const OrdersRecord = () => {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setError(null);
+    setOrders([]);
     fetchOrders();
   }, []);
 
@@ -118,7 +121,7 @@ const OrdersRecord = () => {
   }, [error]);
 
   const renderContent = () => {
-    if (loading || refreshing) {
+    if (loading && !refreshing) {
       return (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#6c4eb6" />
@@ -183,9 +186,20 @@ const OrdersRecord = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Historial de Pedidos</Text>
         </View>
-        <View style={styles.center}>
+        <ScrollView 
+          style={styles.center}
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#6c4eb6']}
+              tintColor="#6c4eb6"
+            />
+          }
+        >
           {renderContent()}
-        </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -224,15 +238,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f6fa',
   },
-  loadingContainer: {
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 20,
+    padding: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
   },
   text: {
-    fontSize: 18,
-    color: '#6c4eb6',
-    fontWeight: '600',
-    marginBottom: 8,
+    fontSize: 20,
+    color: '#333',
+    fontWeight: 'bold',
   },
   subText: {
     fontSize: 14,
@@ -242,12 +263,9 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   error: {
-    color: '#E74C3C',
+    color: 'red',
     fontSize: 16,
-    marginTop: 12,
-    textAlign: 'center',
-    lineHeight: 22,
-    fontWeight: '500',
+    marginTop: 10,
   },
   errorContainer: {
     alignItems: 'center',
