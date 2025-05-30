@@ -14,6 +14,7 @@ import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAxios } from '../hooks/useAxios';
+import CustomModal from '../components/CustomModal';
 
 const ChangePasswordScreen = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -21,6 +22,7 @@ const ChangePasswordScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const navigation = useNavigation();
   const axios = useAxios();
   const insets = useSafeAreaInsets();
@@ -47,7 +49,10 @@ const ChangePasswordScreen = () => {
 
   const handleChangePassword = async () => {
     if (!validatePasswords()) return;
+    setShowConfirmModal(true);
+  };
 
+  const handleConfirmChangePassword = async () => {
     setLoading(true);
     setErrorMessage('');
     try {
@@ -74,6 +79,7 @@ const ChangePasswordScreen = () => {
       setErrorMessage(message);
     } finally {
       setLoading(false);
+      setShowConfirmModal(false);
     }
   };
 
@@ -149,6 +155,15 @@ const ChangePasswordScreen = () => {
           disabled={loading}
         />
       </View>
+
+      <CustomModal
+        visible={showConfirmModal}
+        message="¿Estás seguro que deseas cambiar tu contraseña?"
+        onAccept={handleConfirmChangePassword}
+        onCancel={() => setShowConfirmModal(false)}
+        acceptText="Sí, cambiar contraseña"
+        cancelText="Cancelar"
+      />
     </View>
   );
 };

@@ -15,6 +15,7 @@ import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { useAxios } from '../hooks/useAxios';
 
+
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');

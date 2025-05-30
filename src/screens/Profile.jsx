@@ -15,6 +15,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAxios } from '../hooks/useAxios';
+import CustomModal from '../components/CustomModal';
 
 const Profile = () => {
   const [userData, setUserData] = useState({ name: 'Cargando...', email: 'Cargando...' });
@@ -22,6 +23,7 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [isConnected, setIsConnected] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { logout } = useContext(AuthContext);
   const navigation = useNavigation();
   const axios = useAxios();
@@ -106,28 +108,15 @@ const Profile = () => {
   }, [error]);
 
   const handleLogout = () => {
-    Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro que deseas cerrar sesión?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Sí, cerrar sesión',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await logout();
-            } catch (error) {
-              console.error('Error al cerrar sesión:', error);
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   const renderContent = () => {
@@ -151,6 +140,7 @@ const Profile = () => {
     }
 
     return (
+      
       <View style={styles.contentContainer}>
         <View style={styles.optionContent}>
           <Ionicons name="person-outline" size={24} color="#6c4eb6" />
@@ -187,6 +177,7 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </View>
+     
     );
   };
 
@@ -197,10 +188,6 @@ const Profile = () => {
         { paddingTop: insets.top }
       ]}
     >
-      <StatusBar
-        backgroundColor="#6c4eb6"
-        barStyle="light-content"
-      />
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <TouchableOpacity 
@@ -226,6 +213,15 @@ const Profile = () => {
           {renderContent()}
         </ScrollView>
       </View>
+
+      <CustomModal
+        visible={showLogoutModal}
+        message="¿Estás seguro que deseas cerrar sesión?"
+        onAccept={handleConfirmLogout}
+        onCancel={() => setShowLogoutModal(false)}
+        acceptText="Sí, cerrar sesión"
+        cancelText="Cancelar"
+      />
     </View>
   );
 };

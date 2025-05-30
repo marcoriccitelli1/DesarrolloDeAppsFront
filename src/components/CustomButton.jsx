@@ -16,12 +16,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 10,
   },
   buttonText: {
     color: '#fff',
     fontSize: 17,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

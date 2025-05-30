@@ -4,6 +4,7 @@ import { useAxios } from '../hooks/useAxios';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+
 const OrdersAssigned = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -138,6 +139,7 @@ const OrdersAssigned = () => {
   };
 
   return (
+    
     <View 
       style={[
         styles.mainContainer,

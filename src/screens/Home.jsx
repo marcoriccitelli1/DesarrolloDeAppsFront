@@ -144,10 +144,6 @@ const Home = () => {
         { paddingTop: insets.top }
       ]}
     >
-      <StatusBar
-        backgroundColor="#6c4eb6"
-        barStyle="light-content"
-      />
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Pedidos sin Asignar</Text>

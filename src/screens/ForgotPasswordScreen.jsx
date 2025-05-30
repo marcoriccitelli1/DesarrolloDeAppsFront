@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
+  StatusBar
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { useAxios } from '../hooks/useAxios';
+import { Ionicons } from '@expo/vector-icons';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const axios = useAxios();
+  const insets = useSafeAreaInsets();
 
   const handleSendEmail = async () => {
     if (!email) {
@@ -43,64 +55,106 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Recuperar Contraseña</Text>
-      <View style={styles.form}>
-        <CustomTextField
-          value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-            setError('');
-          }}
-          placeholder="Correo electrónico"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          editable={!loading}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View 
+        style={[
+          styles.mainContainer,
+          { paddingTop: insets.top, paddingBottom: insets.bottom }
+        ]}
+      >
+        <StatusBar
+          backgroundColor="#f9f6fa"
+          barStyle="dark-content"
         />
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        <CustomButton
-          title={loading ? "Enviando..." : "Enviar Correo"}
-          onPress={handleSendEmail}
-          disabled={loading}
-          style={{ width: '70%', alignSelf: 'center' }}
-        />
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Login')}
-          disabled={loading}
-        >
-          <Text style={styles.loginLink}>¿Ya tienes cuenta? Iniciar sesión</Text>
-        </TouchableOpacity>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="chevron-back" size={28} color="#6c4eb6" />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.title}>Recuperar Contraseña</Text>
+          <Text style={styles.subtitle}>
+            Ingresa tu correo electrónico para recibir instrucciones
+          </Text>
+          <View style={styles.form}>
+            <CustomTextField
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setError('');
+              }}
+              placeholder="Correo electrónico"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              editable={!loading}
+            />
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            <CustomButton
+              title={loading ? "Enviando..." : "Enviar Correo"}
+              onPress={handleSendEmail}
+              disabled={loading}
+              style={styles.sendButton}
+            />
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Login')}
+              disabled={loading}
+            >
+              
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#f9f6fa'
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    paddingTop: 70,
+    backgroundColor: '#f9f6fa',
     paddingHorizontal: 20,
+  },
+  header: {
+    width: '100%',
+    height: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  backButton: {
+    padding: 5,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 30,
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#888',
+    marginBottom: 25,
     textAlign: 'center',
   },
   form: {
     width: '100%',
     alignItems: 'center',
   },
-  loginLink: {
-    color: '#3b5fff',
-    fontSize: 14,
-    textDecorationLine: 'underline',
-    marginTop: 12,
-    textAlign: 'center',
+  sendButton: {
+    backgroundColor: '#6c4eb6',
+    width: '70%',
+    alignSelf: 'center',
+    marginTop: 10,
   },
+
   errorText: {
     color: '#ff3b30',
     fontSize: 14,
