@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -14,6 +14,7 @@ import {
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { useAxios } from '../hooks/useAxios';
+import { Ionicons } from '@expo/vector-icons';
 
 
 const RegisterScreen = ({ navigation }) => {
@@ -23,29 +24,60 @@ const RegisterScreen = ({ navigation }) => {
   const [repeatPassword, setRepeatPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const axios = useAxios();
 
+  // Validar email en tiempo real
+  useEffect(() => {
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setEmailError('Correo electrónico no válido');
+      } else {
+        setEmailError('');
+      }
+    } else {
+      setEmailError('');
+    }
+  }, [email]);
+
   const validateForm = () => {
+    // Validar campos vacíos
     if (!fullName || !email || !password || !repeatPassword || !phone) {
       setError('Todos los campos son obligatorios');
       return false;
     }
 
+    // Validar nombre (no vacío)
+    if (fullName.trim().length === 0) {
+      setError('Por favor ingresa tu nombre');
+      return false;
+    }
+
+    // Validar email
+    if (emailError) {
+      setError(emailError);
+      return false;
+    }
+
+    // Validar contraseña
+    if (password.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres');
+      return false;
+    }
+
+    // Validar que las contraseñas coincidan
     if (password !== repeatPassword) {
       setError('Las contraseñas no coinciden');
       return false;
     }
 
-    if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
-      return false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('El correo electrónico no es válido');
+    // Validar teléfono (al menos 8 dígitos)
+    const phoneRegex = /^\d{8,}$/;
+    if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
+      setError('Por favor ingresa un número de teléfono válido (mínimo 8 dígitos)');
       return false;
     }
 
@@ -65,7 +97,7 @@ const RegisterScreen = ({ navigation }) => {
       await axios.post('/auth/register', {
         email,
         password,
-        name: fullName,
+        name: fullName.trim(),
         phone,
       });
 
@@ -80,10 +112,13 @@ const RegisterScreen = ({ navigation }) => {
 
     } catch (err) {
       console.error('Error en registro:', err);
-      setError(
-        err.response?.data?.error || 
-        'Ocurrió un error durante el registro. Por favor, intenta nuevamente.'
-      );
+      if (err.response?.status === 409) {
+        setError('Este correo electrónico ya está registrado');
+      } else if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Ocurrió un error durante el registro. Por favor, intenta nuevamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -100,40 +135,73 @@ const RegisterScreen = ({ navigation }) => {
         <View style={styles.form}>
           <CustomTextField
             value={fullName}
-            onChangeText={setFullName}
-            placeholder="Nombre Completo"
+            onChangeText={(text) => {
+              setFullName(text);
+              setError('');
+            }}
+            placeholder="Nombre"
             autoCapitalize="words"
+            editable={!loading}
           />
-          <CustomTextField
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Correo electrónico"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+          <View style={styles.emailContainer}>
+            <View style={styles.emailInputWrapper}>
+              <CustomTextField
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  setError('');
+                }}
+                placeholder="Correo electrónico"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={!loading}
+              />
+              {email && (
+                <Ionicons 
+                  name={emailError ? "close-circle" : "checkmark-circle"} 
+                  size={20} 
+                  color={emailError ? "#ff3b30" : "#34C759"} 
+                  style={styles.emailIcon}
+                />
+              )}
+            </View>
+            {emailError ? <Text style={styles.emailErrorText}>{emailError}</Text> : null}
+          </View>
           <CustomTextField
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              setError('');
+            }}
             placeholder="Contraseña"
             secureTextEntry
+            editable={!loading}
           />
           <CustomTextField
             value={repeatPassword}
-            onChangeText={setRepeatPassword}
+            onChangeText={(text) => {
+              setRepeatPassword(text);
+              setError('');
+            }}
             placeholder="Repetir contraseña"
             secureTextEntry
+            editable={!loading}
           />
           <CustomTextField
             value={phone}
-            onChangeText={setPhone}
+            onChangeText={(text) => {
+              setPhone(text);
+              setError('');
+            }}
             placeholder="Teléfono"
             keyboardType="phone-pad"
+            editable={!loading}
           />
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
           <CustomButton 
             title={loading ? "Registrando..." : "Registrarse"} 
             onPress={handleRegister}
-            disabled={loading}
+            disabled={loading || !!emailError}
           />
           <TouchableOpacity 
             onPress={() => navigation.navigate('Login')}
@@ -172,6 +240,19 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
+  emailContainer: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  emailInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  emailIcon: {
+    position: 'absolute',
+    right: 10,
+  },
   loginLink: {
     color: '#6c4eb6',
     fontSize: 14,
@@ -180,10 +261,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorText: {
-    color: 'red',
+    color: '#ff3b30',
     fontSize: 14,
     marginBottom: 10,
     textAlign: 'center',
+    fontWeight: '500',
+  },
+  emailErrorText: {
+    color: '#ff3b30',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+    textAlign: 'left',
   },
 });
 
