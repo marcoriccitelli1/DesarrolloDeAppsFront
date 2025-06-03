@@ -129,7 +129,7 @@ const Home = () => {
     }
 
     return (
-      <View style={styles.listContainer}>
+      <View style={{ flex: 1 }}>
         {orders.map((item) => (
           <UnassignedOrderCard key={item.id?.toString() || Math.random().toString()} order={item} />
         ))}
@@ -202,8 +202,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    alignItems: 'center',
-    padding: 20,
+    paddingTop: 16,
+    paddingBottom: 80,
   },
   loadingContainer: {
     alignItems: 'center',
@@ -267,11 +267,6 @@ const styles = StyleSheet.create({
   emptyIcon: {
     fontSize: 40,
     marginBottom: 16,
-  },
-  listContainer: {
-    paddingBottom: 32,
-    paddingTop: 16,
-    width: '100%',
   },
   fullScreenCenter: {
     flex: 1,

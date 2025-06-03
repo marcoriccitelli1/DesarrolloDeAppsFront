@@ -4,7 +4,6 @@ import {
   Text, 
   StyleSheet, 
   TouchableOpacity, 
-  Alert,
   TouchableWithoutFeedback,
   Keyboard,
   StatusBar
@@ -12,6 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
+import CustomModal from '../components/CustomModal';
 import { useAxios } from '../hooks/useAxios';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -19,6 +19,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const axios = useAxios();
   const insets = useSafeAreaInsets();
 
@@ -33,16 +34,11 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
     try {
       await axios.post('/auth/changePassword', { email });
-      Alert.alert(
-        'Correo Enviado',
-        'Se ha enviado un correo con instrucciones para recuperar tu contraseña',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('Login')
-          }
-        ]
-      );
+      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        navigation.navigate('Login');
+      }, 2000);
     } catch (err) {
       console.error('Error al solicitar recuperación de contraseña:', err);
       setError(
@@ -98,14 +94,16 @@ const ForgotPasswordScreen = ({ navigation }) => {
               disabled={loading}
               style={styles.sendButton}
             />
-            <TouchableOpacity 
-              onPress={() => navigation.navigate('Login')}
-              disabled={loading}
-            >
-              
-            </TouchableOpacity>
           </View>
         </View>
+
+        <CustomModal
+          visible={showSuccessModal}
+          message="Se ha enviado un correo con instrucciones para recuperar tu contraseña"
+          onAccept={() => {}}
+          onCancel={() => {}}
+          showButtons={false}
+        />
       </View>
     </TouchableWithoutFeedback>
   );
