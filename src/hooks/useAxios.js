@@ -10,7 +10,7 @@ export const useAxios = () => {
   const navigation = useNavigation();
   const axiosInstance = useRef(axios.create({ 
     baseURL: config.API_BASE_URL,
-    timeout: 1000,
+    timeout: 30000,
     headers: {
       'Content-Type': 'application/json',
     }

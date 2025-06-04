@@ -210,7 +210,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingTop: 16,
+    paddingBottom: 80,
   },
   loadingContainer: {
     alignItems: 'center',

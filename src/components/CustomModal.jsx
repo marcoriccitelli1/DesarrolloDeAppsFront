@@ -19,7 +19,8 @@ const CustomModal = ({
   acceptButtonStyle,
   cancelButtonStyle,
   acceptTextStyle,
-  cancelTextStyle
+  cancelTextStyle,
+  showButtons = true
 }) => {
   return (
     <Modal
@@ -32,20 +33,22 @@ const CustomModal = ({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.message}>{message}</Text>
-            <View style={styles.buttonContainer}>
-              <CustomButton
-                title={cancelText}
-                onPress={onCancel}
-                style={[styles.cancelButton, cancelButtonStyle]}
-                textStyle={[styles.cancelButtonText, cancelTextStyle]}
-              />
-              <CustomButton
-                title={acceptText}
-                onPress={onAccept}
-                style={[styles.acceptButton, acceptButtonStyle]}
-                textStyle={acceptTextStyle}
-              />
-            </View>
+            {showButtons && (
+              <View style={styles.buttonContainer}>
+                <CustomButton
+                  title={cancelText}
+                  onPress={onCancel}
+                  style={[styles.cancelButton, cancelButtonStyle]}
+                  textStyle={[styles.cancelButtonText, cancelTextStyle]}
+                />
+                <CustomButton
+                  title={acceptText}
+                  onPress={onAccept}
+                  style={[styles.acceptButton, acceptButtonStyle]}
+                  textStyle={acceptTextStyle}
+                />
+              </View>
+            )}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#333',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: showButtons => showButtons ? 24 : 0,
     lineHeight: 24,
   },
   buttonContainer: {

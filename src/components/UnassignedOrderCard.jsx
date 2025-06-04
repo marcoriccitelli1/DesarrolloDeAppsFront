@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 14,
-    marginVertical: 12,
+    marginVertical: 8,
     width: '92%',
     alignSelf: 'center',
     overflow: 'hidden',
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#a085ff',
+    backgroundColor: '#6c4eb6',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderTopLeftRadius: 14,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   infoIcon: {
-    marginRight: 8,
+    marginRight: 12,
   },
   infoLabel: {
     fontSize: 15,
