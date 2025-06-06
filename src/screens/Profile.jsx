@@ -21,7 +21,6 @@ const Profile = () => {
   const [userData, setUserData] = useState({ name: 'Cargando...', email: 'Cargando...' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isConnected, setIsConnected] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { logout } = useContext(AuthContext);
@@ -35,11 +34,9 @@ const Profile = () => {
       setError(null);
       const response = await axios.get('/user/getUser');
       setUserData(response.data);
-      setIsConnected(true);
     } catch (err) {
       if (err.message === 'Network Error') {
         setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-        setIsConnected(false);
       } else if (err.response) {
         switch (err.response.status) {
           case 401:
@@ -70,27 +67,8 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        const response = await axios.get('/health');
-        if (response.status === 200) {
-          if (!isConnected) {
-            setIsConnected(true);
-            fetchUserData();
-          }
-        }
-      } catch (err) {
-        if (err.message === 'Network Error') {
-          setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-          setIsConnected(false);
-        }
-      }
-    };
-
-    const intervalId = setInterval(checkConnection, 3000);
     fetchUserData();
-    return () => clearInterval(intervalId);
-  }, [axios, isConnected]);
+  }, []);
 
   // Efecto para limpiar el mensaje de error después de 3 segundos
   useEffect(() => {
@@ -219,7 +197,7 @@ const Profile = () => {
         message="¿Estás seguro que deseas cerrar sesión?"
         onAccept={handleConfirmLogout}
         onCancel={() => setShowLogoutModal(false)}
-        acceptText="Sí, cerrar sesión"
+        acceptText="Cerrar sesión"
         cancelText="Cancelar"
       />
     </View>

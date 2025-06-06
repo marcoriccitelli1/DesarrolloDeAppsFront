@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#333',
     textAlign: 'center',
-    marginBottom: showButtons => showButtons ? 24 : 0,
+    marginBottom: 24,
     lineHeight: 24,
   },
   buttonContainer: {

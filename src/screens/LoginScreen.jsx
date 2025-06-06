@@ -8,14 +8,24 @@ import {
   Image,
   Keyboard,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { AuthContext } from '../context/AuthContext';
 import { useAxios } from '../hooks/useAxios';
+import app from '../config/firebase';
+import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
 
-console.log("LoginScreen: renderizando componente");
+const auth = getAuth(app);
+
+const SocialButton = ({ icon, text, onPress }) => (
+  <TouchableOpacity onPress={onPress} style={styles.socialButton}>
+    <Image source={icon} style={styles.socialIcon} />
+    <Text style={styles.socialText}>{text}</Text>
+  </TouchableOpacity>
+);
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -26,29 +36,23 @@ const LoginScreen = ({ navigation }) => {
   const axios = useAxios();
   const insets = useSafeAreaInsets();
 
-  console.log("LoginScreen: login del contexto:", login);
-
   const handleLogin = async () => {
     if (!email || !password) {
       setError('Por favor completa todos los campos');
       return;
     }
-    
+
     setError('');
     setLoading(true);
-    
+
     try {
-      console.log("LoginScreen: intentando login con", email);
-      const response = await axios.post('/auth/login', {
-        email,
-        password,
-      });
-      
-      console.log("LoginScreen: respuesta del backend:", response.data);
+      const response = await axios.post('/auth/login', { email, password });
+      console.log('Respuesta login:', response.data);
       const { token } = response.data;
       await login(token);
+      console.log('Token guardado:', await getToken());
+      
     } catch (err) {
-      console.log("LoginScreen: error en login:", err?.response?.data);
       if (err.response?.status === 401) {
         setError('Email o contraseña incorrectos');
       } else if (err.response?.data?.error) {
@@ -61,13 +65,65 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  const handleProviderLogin = async (providerType) => {
+    if (!providerType) {
+      setError('Proveedor no especificado');
+      return;
+    }
+  
+    setError('');
+    setLoading(true);
+  
+    try {
+      let provider;
+      if (providerType === 'google') {
+        provider = new GoogleAuthProvider();
+      } else if (providerType === 'facebook') {
+        provider = new FacebookAuthProvider();
+      } else {
+        setError('Proveedor no soportado');
+        setLoading(false);
+        return;
+      }
+  
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const idToken = await user.getIdToken();
+  
+      // Opcional: Verifica formato JWT
+      if (!/^[\w-]+\.[\w-]+\.[\w-]+$/.test(idToken)) {
+        console.error("El idToken no tiene formato JWT:", idToken);
+        setError("Token inválido");
+        setLoading(false);
+        return;
+      }
+  
+      console.log("idToken que se envía al backend:", idToken, idToken.length);
+  
+      const response = await axios.post('/auth/loginWithProvider', { idToken, provider: providerType });
+  
+      const { token } = response.data;
+      await login(token);
+  
+    } catch (err) {
+      console.error('LOGIN PROVIDER ERROR:', err);
+  
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else if (err.response?.status === 401) {
+        setError('Cuenta no registrada o correo no verificado');
+      } else {
+        setError(err.message || 'Error al iniciar sesión con el proveedor');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleGoogleLogin = () => handleProviderLogin('google');
+  
   return (
-    <View 
-      style={[
-        styles.safeArea,
-        { paddingTop: insets.top }
-      ]}
-    >
+    <View style={[styles.safeArea, { paddingTop: insets.top }]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -111,6 +167,17 @@ const LoginScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('Register')}
               disabled={loading}
             />
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>O</Text>
+              <View style={styles.dividerLine} />
+            </View>
+            <SocialButton
+              icon={require('../../assets/google-logo.png')}
+              text="Continuar con Google"
+              onPress={handleGoogleLogin}
+            />
+            
             <Text 
               style={styles.forgotPassword} 
               onPress={() => !loading && navigation.navigate('ForgotPassword')}>
@@ -181,6 +248,46 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
   },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 15,
+    width: '100%',
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ccc',
+  },
+  dividerText: {
+    marginHorizontal: 8,
+    color: '#888',
+    fontWeight: '500',
+  },
+  socialButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#fff', 
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 6,
+    marginTop: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  socialIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 10,
+    resizeMode: 'contain',
+  },
+  socialText: {
+    color: '#333', 
+    fontWeight: '600',
+    fontSize: 15,
+  },  
 });
 
 export default LoginScreen;

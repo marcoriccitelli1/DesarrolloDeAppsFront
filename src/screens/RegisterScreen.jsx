@@ -9,13 +9,24 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Modal
 } from 'react-native';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { useAxios } from '../hooks/useAxios';
 import { Ionicons } from '@expo/vector-icons';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import app from '../config/firebase';
 
+const auth = getAuth(app);
+
+const SocialButton = ({ icon, text, onPress, disabled }) => (
+  <TouchableOpacity onPress={onPress} style={[styles.socialButton, disabled && styles.disabledButton]} disabled={disabled}>
+    <Image source={icon} style={styles.socialIcon} />
+    <Text style={styles.socialText}>{text}</Text>
+  </TouchableOpacity>
+);
 
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
@@ -26,6 +37,8 @@ const RegisterScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [googleUserData, setGoogleUserData] = useState(null);
   
   const axios = useAxios();
 
@@ -124,6 +137,104 @@ const RegisterScreen = ({ navigation }) => {
     }
   };
 
+  const handleProviderRegister = async (providerType) => {
+    if (!providerType) {
+      setError('Proveedor no especificado');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+
+    try {
+      let provider;
+      if (providerType === 'google') {
+        provider = new GoogleAuthProvider();
+      } else {
+        setError('Proveedor no soportado');
+        setLoading(false);
+        return;
+      }
+
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const idToken = await user.getIdToken();
+
+      // Verifica formato JWT
+      if (!/^[\w-]+\.[\w-]+\.[\w-]+$/.test(idToken)) {
+        console.error("El idToken no tiene formato JWT:", idToken);
+        setError("Token inválido");
+        setLoading(false);
+        return;
+      }
+
+      setGoogleUserData({
+        idToken,
+        name: user.displayName,
+        email: user.email
+      });
+      
+      setShowPhoneModal(true);
+
+    } catch (err) {
+      console.error('REGISTER PROVIDER ERROR:', err);
+      setError(err.message || 'Error al registrarse con el proveedor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCompleteGoogleRegister = async () => {
+    if (!phone.trim()) {
+      setError('El teléfono es obligatorio');
+      return;
+    }
+
+    const phoneRegex = /^\d{8,}$/;
+    if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
+      setError('Por favor ingresa un número de teléfono válido (mínimo 8 dígitos)');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await axios.post('/auth/registerWithProvider', {
+        idToken: googleUserData.idToken,
+        name: googleUserData.name,
+        phone: phone.trim()
+      });
+
+      setShowPhoneModal(false);
+      setGoogleUserData(null);
+      setPhone('');
+
+      Alert.alert(
+        'Registro Exitoso',
+        'Te hemos enviado un correo de verificación. Por favor, verifica tu correo electrónico antes de iniciar sesión.',
+        [{ 
+          text: 'OK',
+          onPress: () => navigation.navigate('Login')
+        }]
+      );
+
+    } catch (err) {
+      console.error('COMPLETE REGISTER ERROR:', err);
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else if (err.response?.status === 409) {
+        setError('Este correo electrónico ya está registrado');
+      } else {
+        setError(err.message || 'Error al completar el registro');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleRegister = () => handleProviderRegister('google');
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView 
@@ -203,6 +314,20 @@ const RegisterScreen = ({ navigation }) => {
             onPress={handleRegister}
             disabled={loading || !!emailError}
           />
+
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>O</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <SocialButton
+            icon={require('../../assets/google-logo.png')}
+            text="Registrarse con Google"
+            onPress={handleGoogleRegister}
+            disabled={loading}
+          />
+
           <TouchableOpacity 
             onPress={() => navigation.navigate('Login')}
             disabled={loading}
@@ -210,6 +335,63 @@ const RegisterScreen = ({ navigation }) => {
             <Text style={styles.loginLink}>¿Ya tenés cuenta? Iniciar sesión</Text>
           </TouchableOpacity>
         </View>
+
+        <Modal
+          visible={showPhoneModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => {
+            setShowPhoneModal(false);
+            setGoogleUserData(null);
+            setPhone('');
+            setError('');
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Completa tu registro</Text>
+              <Text style={styles.modalSubtitle}>
+                Hola {googleUserData?.name}, para completar tu registro necesitamos tu número de teléfono
+              </Text>
+              
+              <CustomTextField
+                value={phone}
+                onChangeText={(text) => {
+                  setPhone(text);
+                  setError('');
+                }}
+                placeholder="Teléfono"
+                keyboardType="phone-pad"
+                editable={!loading}
+              />
+              
+              {error ? <Text style={styles.errorText}>{error}</Text> : null}
+              
+              <View style={styles.modalButtons}>
+                <TouchableOpacity 
+                  style={styles.modalButton}
+                  onPress={() => {
+                    setShowPhoneModal(false);
+                    setGoogleUserData(null);
+                    setPhone('');
+                    setError('');
+                  }}
+                >
+                  <Text style={styles.cancelButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.modalButton, styles.completeButton]}
+                  onPress={handleCompleteGoogleRegister}
+                  disabled={loading}
+                >
+                  <Text style={styles.completeButtonText}>
+                    {loading ? "Registrando..." : "Completar registro"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
@@ -273,6 +455,105 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginLeft: 4,
     textAlign: 'left',
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 15,
+    width: '100%',
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ccc',
+  },
+  dividerText: {
+    marginHorizontal: 8,
+    color: '#888',
+    fontWeight: '500',
+  },
+  socialButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 6,
+    marginTop: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  socialIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 10,
+    resizeMode: 'contain',
+  },
+  socialText: {
+    color: '#333',
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    width: '100%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#666',
+    paddingHorizontal: 10,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 20,
+    gap: 10,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E0E0E0',
+  },
+  completeButton: {
+    backgroundColor: '#6c4eb6',
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  completeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
 });
 
