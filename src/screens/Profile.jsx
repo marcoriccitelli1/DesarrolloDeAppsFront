@@ -219,7 +219,7 @@ const Profile = () => {
         message="¿Estás seguro que deseas cerrar sesión?"
         onAccept={handleConfirmLogout}
         onCancel={() => setShowLogoutModal(false)}
-        acceptText="Sí, cerrar sesión"
+        acceptText="Cerrar sesión"
         cancelText="Cancelar"
       />
     </View>
