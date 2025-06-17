@@ -7,6 +7,7 @@ import {
   Platform,
   Image,
   Keyboard,
+  TouchableWithoutFeedback,
   Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -68,7 +69,7 @@ const LoginScreen = ({ navigation }) => {
         { paddingTop: insets.top }
       ]}
     >
-      <Pressable onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.container}
@@ -111,15 +112,15 @@ const LoginScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('Register')}
               disabled={loading}
             />
-            <Text 
-              style={styles.forgotPassword} 
-              onPress={() => !loading && navigation.navigate('ForgotPassword')}>
-              ¿Olvidaste tu contraseña?
-            </Text>
+            <Pressable 
+              onPress={() => !loading && navigation.navigate('ForgotPassword')}
+            >
+              <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>
+            </Pressable>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
           </View>
         </KeyboardAvoidingView>
-      </Pressable>
+      </TouchableWithoutFeedback>
     </View>
   );
 };

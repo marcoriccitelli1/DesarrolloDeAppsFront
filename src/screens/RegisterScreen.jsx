@@ -126,7 +126,7 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   return (
-    <Pressable onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -212,7 +212,7 @@ const RegisterScreen = ({ navigation }) => {
           </Pressable>
         </View>
       </KeyboardAvoidingView>
-    </Pressable>
+    </TouchableWithoutFeedback>
   );
 };
 
