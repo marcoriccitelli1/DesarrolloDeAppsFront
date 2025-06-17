@@ -6,7 +6,8 @@ import {
   TouchableOpacity, 
   TouchableWithoutFeedback,
   Keyboard,
-  StatusBar
+  StatusBar,
+  Pressable
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
@@ -64,12 +65,9 @@ const ForgotPasswordScreen = ({ navigation }) => {
         />
         <View style={styles.container}>
           <View style={styles.header}>
-            <TouchableOpacity 
-              style={styles.backButton} 
-              onPress={() => navigation.goBack()}
-            >
+            <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
               <Ionicons name="chevron-back" size={28} color="#6c4eb6" />
-            </TouchableOpacity>
+            </Pressable>
           </View>
           <Text style={styles.title}>Recuperar Contraseña</Text>
           <Text style={styles.subtitle}>
@@ -161,4 +159,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ForgotPasswordScreen; 
+export default ForgotPasswordScreen;

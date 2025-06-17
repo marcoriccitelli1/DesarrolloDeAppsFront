@@ -7,7 +7,7 @@ import {
   Platform,
   Image,
   Keyboard,
-  TouchableWithoutFeedback,
+  Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
@@ -68,7 +68,7 @@ const LoginScreen = ({ navigation }) => {
         { paddingTop: insets.top }
       ]}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <Pressable onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.container}
@@ -119,7 +119,7 @@ const LoginScreen = ({ navigation }) => {
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
           </View>
         </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+      </Pressable>
     </View>
   );
 };

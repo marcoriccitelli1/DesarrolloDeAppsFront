@@ -5,7 +5,7 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-  TouchableOpacity,
+  Pressable,
   Alert
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -96,12 +96,12 @@ const ChangePasswordScreen = () => {
       />
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity 
+          <Pressable 
             style={styles.backButton} 
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="chevron-back" size={28} color="#6c4eb6" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <Text style={styles.title}>Cambiar Contraseña</Text>
         <Text style={styles.subtitle}>
