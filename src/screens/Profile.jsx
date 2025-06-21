@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   ScrollView,
+  Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
@@ -147,15 +148,15 @@ const Profile = () => {
           <Text style={styles.name}>{userData?.name || 'Usuario'}</Text>
         </View>
         <View style={styles.userInfo}>
-          <TouchableOpacity style={styles.option} onPress={() => {}}>
+          <Pressable style={styles.option} onPress={() => {}}>
             <View style={styles.optionContent}>
               <Ionicons name="mail-outline" size={24} color="#6c4eb6" />
               <Text style={styles.optionText}>{userData?.email || 'Email'}</Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <View style={styles.optionsContainer}>
-          <TouchableOpacity 
+          <Pressable 
             style={styles.option}
             onPress={() => {
               console.log('Intentando navegar a ChangePassword');
@@ -167,14 +168,14 @@ const Profile = () => {
               <Ionicons name="key-outline" size={24} color="#6c4eb6" />
               <Text style={styles.optionText}>Cambiar Contraseña</Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
           <View style={styles.separator} />
-          <TouchableOpacity style={styles.option} onPress={handleLogout}>
+          <Pressable style={styles.option} onPress={handleLogout}>
             <View style={styles.optionContent}>
               <Ionicons name="log-out-outline" size={24} color="#E74C3C" />
               <Text style={[styles.optionText, styles.logoutText]}>Cerrar Sesión</Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
      
@@ -190,12 +191,12 @@ const Profile = () => {
     >
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
-          <TouchableOpacity 
+          <Pressable 
             style={styles.backButton} 
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="chevron-back" size={28} color="#fff" />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>Tu Perfil</Text>
         </View>
         <ScrollView 
@@ -219,7 +220,7 @@ const Profile = () => {
         message="¿Estás seguro que deseas cerrar sesión?"
         onAccept={handleConfirmLogout}
         onCancel={() => setShowLogoutModal(false)}
-        acceptText="Sí, cerrar sesión"
+        acceptText="Cerrar sesión"
         cancelText="Cancelar"
       />
     </View>

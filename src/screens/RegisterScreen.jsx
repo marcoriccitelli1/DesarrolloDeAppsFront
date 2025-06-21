@@ -9,7 +9,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Pressable
 } from 'react-native';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
@@ -203,12 +204,12 @@ const RegisterScreen = ({ navigation }) => {
             onPress={handleRegister}
             disabled={loading || !!emailError}
           />
-          <TouchableOpacity 
+          <Pressable 
             onPress={() => navigation.navigate('Login')}
             disabled={loading}
           >
             <Text style={styles.loginLink}>¿Ya tenés cuenta? Iniciar sesión</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

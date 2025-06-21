@@ -7,6 +7,7 @@ import Home from '../screens/Home';
 import OrdersAssigned from '../screens/OrdersAssigned';
 import OrdersRecord from '../screens/OrdersRecord';
 import Profile from '../screens/Profile';
+import QRScannerScreen from '../screens/QRScannerScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -68,7 +69,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="QRTab"
-        component={Home}
+        component={QRScannerScreen}
         options={{
           tabBarLabel: '',
           tabBarIcon: () => <QRButton />,

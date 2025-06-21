@@ -8,6 +8,7 @@ import {
   Image,
   Keyboard,
   TouchableWithoutFeedback,
+  Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
@@ -111,11 +112,11 @@ const LoginScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('Register')}
               disabled={loading}
             />
-            <Text 
-              style={styles.forgotPassword} 
-              onPress={() => !loading && navigation.navigate('ForgotPassword')}>
-              ¿Olvidaste tu contraseña?
-            </Text>
+            <Pressable 
+              onPress={() => !loading && navigation.navigate('ForgotPassword')}
+            >
+              <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>
+            </Pressable>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
           </View>
         </KeyboardAvoidingView>

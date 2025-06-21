@@ -20,7 +20,8 @@ const CustomModal = ({
   cancelButtonStyle,
   acceptTextStyle,
   cancelTextStyle,
-  showButtons = true
+  showButtons = true,
+  showCancelButton = true
 }) => {
   return (
     <Modal
@@ -35,16 +36,22 @@ const CustomModal = ({
             <Text style={styles.message}>{message}</Text>
             {showButtons && (
               <View style={styles.buttonContainer}>
-                <CustomButton
-                  title={cancelText}
-                  onPress={onCancel}
-                  style={[styles.cancelButton, cancelButtonStyle]}
-                  textStyle={[styles.cancelButtonText, cancelTextStyle]}
-                />
+                {showCancelButton && (
+                  <CustomButton
+                    title={cancelText}
+                    onPress={onCancel}
+                    style={[styles.cancelButton, cancelButtonStyle]}
+                    textStyle={[styles.cancelButtonText, cancelTextStyle]}
+                  />
+                )}
                 <CustomButton
                   title={acceptText}
                   onPress={onAccept}
-                  style={[styles.acceptButton, acceptButtonStyle]}
+                  style={[
+                    styles.acceptButton, 
+                    acceptButtonStyle,
+                    !showCancelButton && styles.fullWidthButton
+                  ]}
                   textStyle={acceptTextStyle}
                 />
               </View>
@@ -100,6 +107,9 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#fff',
+  },
+  fullWidthButton: {
+    flex: 1,
   },
 });
 
