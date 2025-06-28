@@ -1,58 +1,74 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar, RefreshControl, ScrollView } from 'react-native';
 import { useAxios } from '../hooks/useAxios';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
+import AssignedOrderCard from '../components/AssignedOrderCard';
 
 const OrdersAssigned = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isConnected, setIsConnected] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const axios = useAxios();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    navigation.setOptions({
-      gestureEnabled: false
-    });
-  }, [navigation]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      const response = await axios.get('/orders');
+      console.log('Haciendo petición a /orders/getAssignedOrders...');
+      const response = await axios.get('/orders/getAssignedOrders');
+      
+      console.log('Respuesta completa:', response);
+      console.log('Response.data:', response.data);
+      console.log('Response.status:', response.status);
       
       if (!response.data) {
         throw new Error('No se recibieron datos del servidor');
       }
       
-      setOrders(response.data.orders || []);
-      setIsConnected(true);
+      let ordersData = [];
+      if (response.data.orders) {
+        ordersData = response.data.orders;
+        console.log('Usando response.data.orders');
+      } else if (Array.isArray(response.data)) {
+        ordersData = response.data;
+        console.log('Usando response.data como array');
+      } else if (response.data.data && Array.isArray(response.data.data)) {
+        ordersData = response.data.data;
+        console.log('Usando response.data.data');
+      } else {
+        console.log('Estructura de datos inesperada:', response.data);
+        ordersData = [];
+      }
+      
+      console.log('Pedidos procesados:', ordersData);
+      setOrders(ordersData);
     } catch (err) {
+      console.error('Error en fetchOrders:', err);
+      console.error('Error response:', err.response ? JSON.stringify(err.response) : 'N/A');
+      console.error('Error message:', err.message);
+      
       if (err.response && err.response.status === 404) {
         setOrders([]);
-        setError(null);
-      } else if (err.message === 'Network Error') {
+        setError(null); // Correcto: no es un error, sino un estado vacío.
+      } else if (!err.response || err.message === 'Network Error') {
         setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-        setIsConnected(false);
       } else if (err.response) {
         switch (err.response.status) {
           case 401:
             setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
             break;
           case 403:
-            setError('No tienes permisos para ver estas órdenes.');
+            setError('No tienes permisos para ver estos pedidos.');
             break;
           case 500:
             setError('Error en el servidor. Por favor, intenta más tarde.');
             break;
           default:
-            setError('Ocurrió un error al cargar las órdenes.');
+            setError(`Error ${err.response.status}: ${err.response.data?.message || 'Ocurrió un error al cargar los pedidos.'}`);
         }
       } else {
         setError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
@@ -61,39 +77,33 @@ const OrdersAssigned = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [axios]);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setError(null);
-    setOrders([]);
     fetchOrders();
-  }, []);
+  }, [fetchOrders]);
 
   useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        const response = await axios.get('/health');
-        if (response.status === 200) {
-          if (!isConnected) {
-            setIsConnected(true);
-            fetchOrders();
-          }
-        }
-      } catch (err) {
-        if (err.message === 'Network Error') {
-          setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-          setIsConnected(false);
-        }
-      }
-    };
+    navigation.setOptions({
+      gestureEnabled: false
+    });
 
-    const intervalId = setInterval(checkConnection, 3000);
-    fetchOrders();
-    return () => clearInterval(intervalId);
-  }, [axios, isConnected]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log("La pantalla ha ganado foco, actualizando pedidos...");
+      fetchOrders();
+    });
+
+    return unsubscribe;
+  }, [navigation, fetchOrders]);
+
+  const handleOrderPress = (order) => {
+    navigation.navigate('OrderDetail', { order });
+  };
 
   const renderContent = () => {
+    console.log('Estado actual - loading:', loading, 'refreshing:', refreshing, 'orders.length:', orders.length, 'error:', error);
+    
     if (loading && !refreshing) {
       return (
         <View style={styles.loadingContainer}>
@@ -125,14 +135,15 @@ const OrdersAssigned = () => {
       );
     }
 
+    console.log('Renderizando pedidos:', orders);
     return (
-      <View style={{ flex: 1 }}>
-        {orders.map((item) => (
-          <View key={item.id?.toString() || Math.random().toString()} style={styles.orderItem}>
-            <Text style={styles.text}>ID: {item.id}</Text>
-            {item.estante && <Text>Estante: {item.estante}</Text>}
-            {item.gondola && <Text>Góndola: {item.gondola}</Text>}
-          </View>
+      <View style={styles.listContainer}>
+        {orders.map((order) => (
+          <AssignedOrderCard
+            key={order.id?.toString() || Math.random().toString()}
+            order={order}
+            onPress={handleOrderPress}
+          />
         ))}
       </View>
     );
@@ -155,7 +166,10 @@ const OrdersAssigned = () => {
           <Text style={styles.headerTitle}>Pedidos Asignados</Text>
         </View>
         <ScrollView
-          contentContainerStyle={styles.center}
+          contentContainerStyle={[
+            styles.scrollContentContainer,
+            { paddingBottom: insets.bottom + 20 }
+          ]}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -200,6 +214,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     letterSpacing: 0.5,
+  },
+  scrollContentContainer: {
+    flexGrow: 1,
+    backgroundColor: '#f9f6fa',
   },
   center: {
     flex: 1,
@@ -279,23 +297,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f9f6fa',
   },
-  orderItem: {
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 12,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#E8E8E8',
-  },
 });
 
-export default OrdersAssigned; 
+export default OrdersAssigned;

@@ -10,7 +10,7 @@ export const useAxios = () => {
   const navigation = useNavigation();
   const axiosInstance = useRef(axios.create({ 
     baseURL: config.API_BASE_URL,
-    timeout: 30000,
+    timeout: 5000,
     headers: {
       'Content-Type': 'application/json',
     }
@@ -41,9 +41,6 @@ export const useAxios = () => {
         
         if (err.response?.status === 401 && !err.config.url.includes('/auth/login')) {
           await logout();
-          if (navigation) {
-            navigation.navigate('Login');
-          }
         }
         return Promise.reject(err);
       }

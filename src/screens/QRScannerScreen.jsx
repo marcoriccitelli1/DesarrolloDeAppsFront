@@ -22,12 +22,24 @@ const QRScannerScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
 
   const [permission, requestPermission] = useCameraPermissions();
+  const [cameraKey, setCameraKey] = useState(0);
 
   useEffect(() => {
     (async () => {
       requestPermission();
     })();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // Resetea el estado del scanner y fuerza el remount de la cámara
+      scannedRef.current = false;
+      setScanned(false);
+      setCameraKey(prevKey => prevKey + 1);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const handleBarCodeScanned = async ({ type, data }) => {
     if (scannedRef.current) return;
@@ -94,6 +106,7 @@ const QRScannerScreen = ({ navigation }) => {
         {!scanned ? (
           <View style={styles.cameraContainer}>
             <CameraView
+              key={cameraKey}
               style={[styles.camera, { marginBottom: 60 }]}
               barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
               onBarcodeScanned={handleBarCodeScanned}

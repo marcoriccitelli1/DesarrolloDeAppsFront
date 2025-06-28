@@ -5,7 +5,8 @@ import {
   StyleSheet, 
   Modal, 
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  TextInput
 } from 'react-native';
 import CustomButton from './CustomButton';
 
@@ -21,7 +22,15 @@ const CustomModal = ({
   acceptTextStyle,
   cancelTextStyle,
   showButtons = true,
-  showCancelButton = true
+  showCancelButton = true,
+  showInput = false,
+  inputValue,
+  onInputChange,
+  inputPlaceholder = "Ingrese el código",
+  inputKeyboardType = 'default',
+  inputMaxLength,
+  errorText,
+  successText
 }) => {
   return (
     <Modal
@@ -34,7 +43,20 @@ const CustomModal = ({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.message}>{message}</Text>
-            {showButtons && (
+            {showInput && !successText && (
+              <TextInput
+                style={styles.input}
+                value={inputValue}
+                onChangeText={onInputChange}
+                placeholder={inputPlaceholder}
+                keyboardType={inputKeyboardType}
+                maxLength={inputMaxLength}
+                placeholderTextColor="#999"
+              />
+            )}
+            {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
+            {successText ? <Text style={styles.successText}>{successText}</Text> : null}
+            {showButtons && !successText && (
               <View style={styles.buttonContainer}>
                 {showCancelButton && (
                   <CustomButton
@@ -89,8 +111,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#333',
     textAlign: 'center',
-    marginBottom: showButtons => showButtons ? 24 : 0,
+    marginBottom: 24,
     lineHeight: 24,
+  },
+  input: {
+    height: 50,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    marginBottom: 10,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#f9f9f9',
+  },
+  errorText: {
+    color: '#D32F2F',
+    textAlign: 'center',
+    marginBottom: 15,
+    fontSize: 14,
+  },
+  successText: {
+    color: '#34A853',
+    textAlign: 'center',
+    marginBottom: 15,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
