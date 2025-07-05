@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { AuthContext } from '../context/AuthContext';
-import { useAxios } from '../hooks/useAxios';
+import { useAuthService } from '../services/authService';
 
 console.log("LoginScreen: renderizando componente");
 
@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
-  const axios = useAxios();
+  const authService = useAuthService();
   const insets = useSafeAreaInsets();
 
   console.log("LoginScreen: login del contexto:", login);
@@ -40,23 +40,18 @@ const LoginScreen = ({ navigation }) => {
     
     try {
       console.log("LoginScreen: intentando login con", email);
-      const response = await axios.post('/auth/login', {
-        email,
-        password,
-      });
+      const result = await authService.login(email, password);
       
-      console.log("LoginScreen: respuesta del backend:", response.data);
-      const { token } = response.data;
-      await login(token);
-    } catch (err) {
-      console.log("LoginScreen: error en login:", err?.response?.data);
-      if (err.response?.status === 401) {
-        setError('Email o contraseña incorrectos');
-      } else if (err.response?.data?.error) {
-        setError(err.response.data.error);
+      if (result.success) {
+        console.log("LoginScreen: respuesta del backend:", result.data);
+        const { token } = result.data;
+        await login(token);
       } else {
-        setError('Error al intentar iniciar sesión');
+        setError(result.error);
       }
+    } catch (err) {
+      console.log("LoginScreen: error inesperado:", err);
+      setError('Error al intentar iniciar sesión');
     } finally {
       setLoading(false);
     }

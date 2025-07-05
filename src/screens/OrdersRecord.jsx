@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar, RefreshControl, ScrollView } from 'react-native';
-import { useAxios } from '../hooks/useAxios';
-import { getToken } from '../utils/tokenStorage';
+import { useOrderService } from '../services/orderService';
 import ComponentOrdersRecord from '../components/ComponentOrdersRecord';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +11,7 @@ const OrdersRecord = () => {
   const [error, setError] = useState(null);
   const [isConnected, setIsConnected] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const axios = useAxios();
+  const orderService = useOrderService();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
@@ -26,48 +25,21 @@ const OrdersRecord = () => {
     try {
       setLoading(true);
       setError(null);
-      const token = await getToken();
-      if (!token) {
-        setError('No autenticado');
-        setLoading(false);
-        setOrders([]);
-        return;
-      }
-      const response = await axios.get('/orders/getOrdersRecord', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
       
-      if (Array.isArray(response.data)) {
-        setOrders(response.data);
-      } else if (Array.isArray(response.data.orders)) {
-        setOrders(response.data.orders);
+      const result = await orderService.getOrdersRecord();
+      
+      if (result.success) {
+        setOrders(result.data);
+        setIsConnected(true);
       } else {
-        setOrders([]);
-      }
-      setIsConnected(true);
-    } catch (err) {
-      if (err.message === 'Network Error') {
-        setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-        setIsConnected(false);
-      } else if (err.response) {
-        switch (err.response.status) {
-          case 401:
-            setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-            break;
-          case 403:
-            setError('No tienes permisos para ver el historial de pedidos.');
-            break;
-          case 500:
-            setError('Error en el servidor. Por favor, intenta más tarde.');
-            break;
-          default:
-            setError('Error al cargar el historial de pedidos');
+        setError(result.error);
+        if (result.isNetworkError) {
+          setIsConnected(false);
         }
-      } else {
-        setError('Error al cargar el historial de pedidos');
       }
+    } catch (err) {
+      console.error('Error inesperado:', err);
+      setError('Error al cargar el historial de pedidos');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -84,25 +56,23 @@ const OrdersRecord = () => {
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        const response = await axios.get('/health');
-        if (response.status === 200) {
+        const result = await orderService.checkConnection();
+        if (result.success && result.isConnected) {
           if (!isConnected) {
             setIsConnected(true);
             fetchOrders();
           }
         }
       } catch (err) {
-        if (err.message === 'Network Error') {
-          setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-          setIsConnected(false);
-        }
+        console.error('Error checking connection:', err);
+        setIsConnected(false);
       }
     };
 
     const intervalId = setInterval(checkConnection, 3000);
     fetchOrders();
     return () => clearInterval(intervalId);
-  }, [axios, isConnected]);
+  }, [orderService, isConnected]);
 
   const renderContent = () => {
     if (loading && !refreshing) {

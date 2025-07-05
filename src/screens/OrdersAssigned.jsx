@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar, RefreshControl, ScrollView } from 'react-native';
-import { useAxios } from '../hooks/useAxios';
+import { useOrderService } from '../services/orderService';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AssignedOrderCard from '../components/AssignedOrderCard';
@@ -10,7 +10,7 @@ const OrdersAssigned = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const axios = useAxios();
+  const orderService = useOrderService();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
@@ -19,65 +19,27 @@ const OrdersAssigned = () => {
     setError(null);
     try {
       console.log('Haciendo petición a /orders/getAssignedOrders...');
-      const response = await axios.get('/orders/getAssignedOrders');
+      const result = await orderService.getAssignedOrders();
       
-      console.log('Respuesta completa:', response);
-      console.log('Response.data:', response.data);
-      console.log('Response.status:', response.status);
-      
-      if (!response.data) {
-        throw new Error('No se recibieron datos del servidor');
-      }
-      
-      let ordersData = [];
-      if (response.data.orders) {
-        ordersData = response.data.orders;
-        console.log('Usando response.data.orders');
-      } else if (Array.isArray(response.data)) {
-        ordersData = response.data;
-        console.log('Usando response.data como array');
-      } else if (response.data.data && Array.isArray(response.data.data)) {
-        ordersData = response.data.data;
-        console.log('Usando response.data.data');
+      if (result.success) {
+        console.log('Pedidos procesados:', result.data);
+        setOrders(result.data);
       } else {
-        console.log('Estructura de datos inesperada:', response.data);
-        ordersData = [];
-      }
-      
-      console.log('Pedidos procesados:', ordersData);
-      setOrders(ordersData);
-    } catch (err) {
-      console.error('Error en fetchOrders:', err);
-      console.error('Error response:', err.response ? JSON.stringify(err.response) : 'N/A');
-      console.error('Error message:', err.message);
-      
-      if (err.response && err.response.status === 404) {
-        setOrders([]);
-        setError(null); // Correcto: no es un error, sino un estado vacío.
-      } else if (!err.response || err.message === 'Network Error') {
-        setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-      } else if (err.response) {
-        switch (err.response.status) {
-          case 401:
-            setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-            break;
-          case 403:
-            setError('No tienes permisos para ver estos pedidos.');
-            break;
-          case 500:
-            setError('Error en el servidor. Por favor, intenta más tarde.');
-            break;
-          default:
-            setError(`Error ${err.response.status}: ${err.response.data?.message || 'Ocurrió un error al cargar los pedidos.'}`);
+        if (result.status === 404) {
+          setOrders([]);
+          setError(null); // No es un error, sino un estado vacío
+        } else {
+          setError(result.error);
         }
-      } else {
-        setError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
       }
+    } catch (err) {
+      console.error('Error inesperado en fetchOrders:', err);
+      setError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [axios]);
+  }, [orderService]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

@@ -13,7 +13,7 @@ import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAxios } from '../hooks/useAxios';
+import { useUserService } from '../services/userService';
 import CustomModal from '../components/CustomModal';
 
 const ChangePasswordScreen = () => {
@@ -24,7 +24,7 @@ const ChangePasswordScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const navigation = useNavigation();
-  const axios = useAxios();
+  const userService = useUserService();
   const insets = useSafeAreaInsets();
 
   const validatePasswords = () => {
@@ -56,27 +56,25 @@ const ChangePasswordScreen = () => {
     setLoading(true);
     setErrorMessage('');
     try {
-      const response = await axios.post('/user/changePassword', {
-        currentPassword,
-        newPassword
-      });
+      const result = await userService.changePassword(currentPassword, newPassword);
 
-      Alert.alert(
-        'Éxito',
-        'Contraseña actualizada correctamente',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack()
-          }
-        ]
-      );
-    } catch (error) {
-      let message = 'Error al cambiar la contraseña';
-      if (error.response?.data?.message) {
-        message = error.response.data.message;
+      if (result.success) {
+        Alert.alert(
+          'Éxito',
+          'Contraseña actualizada correctamente',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack()
+            }
+          ]
+        );
+      } else {
+        setErrorMessage(result.error);
       }
-      setErrorMessage(message);
+    } catch (error) {
+      console.error('Error inesperado:', error);
+      setErrorMessage('Error al cambiar la contraseña');
     } finally {
       setLoading(false);
       setShowConfirmModal(false);

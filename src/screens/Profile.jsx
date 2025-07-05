@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAxios } from '../hooks/useAxios';
+import { useUserService } from '../services/userService';
 import CustomModal from '../components/CustomModal';
 
 const Profile = () => {
@@ -27,37 +27,28 @@ const Profile = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { logout } = useContext(AuthContext);
   const navigation = useNavigation();
-  const axios = useAxios();
+  const userService = useUserService();
   const insets = useSafeAreaInsets();
 
   const fetchUserData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('/user/getUser');
-      setUserData(response.data);
-      setIsConnected(true);
-    } catch (err) {
-      if (err.message === 'Network Error') {
-        setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-        setIsConnected(false);
-      } else if (err.response) {
-        switch (err.response.status) {
-          case 401:
-            setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-            break;
-          case 403:
-            setError('No tienes permisos para ver tu perfil.');
-            break;
-          case 500:
-            setError('Error en el servidor. Por favor, intenta más tarde.');
-            break;
-          default:
-            setError('Error al cargar los datos del perfil');
-        }
+      
+      const result = await userService.getUserProfile();
+      
+      if (result.success) {
+        setUserData(result.data);
+        setIsConnected(true);
       } else {
-        setError('Error al cargar los datos del perfil');
+        setError(result.error);
+        if (result.isNetworkError) {
+          setIsConnected(false);
+        }
       }
+    } catch (err) {
+      console.error('Error inesperado:', err);
+      setError('Error al cargar los datos del perfil');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -73,25 +64,23 @@ const Profile = () => {
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        const response = await axios.get('/health');
-        if (response.status === 200) {
+        const result = await userService.checkConnection();
+        if (result.success && result.isConnected) {
           if (!isConnected) {
             setIsConnected(true);
             fetchUserData();
           }
         }
       } catch (err) {
-        if (err.message === 'Network Error') {
-          setError('No hay conexión a internet. Por favor, verifica tu conexión.');
-          setIsConnected(false);
-        }
+        console.error('Error checking connection:', err);
+        setIsConnected(false);
       }
     };
 
     const intervalId = setInterval(checkConnection, 3000);
     fetchUserData();
     return () => clearInterval(intervalId);
-  }, [axios, isConnected]);
+  }, [userService, isConnected]);
 
   // Efecto para limpiar el mensaje de error después de 3 segundos
   useEffect(() => {

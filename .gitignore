@@ -35,3 +35,6 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Documentation
+MEJORAS_IMPLEMENTADAS.md
