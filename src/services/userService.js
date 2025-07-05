@@ -111,10 +111,18 @@ export const useUserService = () => {
         isConnected: response.status === 200
       };
     } catch (err) {
+      // Si es 404, no mostrar error ni loguear
+      if (err.response && err.response.status === 404) {
+        return {
+          success: false,
+          isConnected: false
+        };
+      }
+      // Otros errores sí pueden loguearse si se desea
+      // console.error('Error en checkConnection:', err);
       return {
         success: false,
-        isConnected: false,
-        ...handleUserError(err)
+        isConnected: false
       };
     }
   };

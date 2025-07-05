@@ -72,7 +72,7 @@ const OrdersRecord = () => {
     const intervalId = setInterval(checkConnection, 3000);
     fetchOrders();
     return () => clearInterval(intervalId);
-  }, [orderService, isConnected]);
+  }, [isConnected]);
 
   const renderContent = () => {
     if (loading && !refreshing) {

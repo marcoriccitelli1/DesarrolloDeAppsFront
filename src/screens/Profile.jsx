@@ -80,7 +80,7 @@ const Profile = () => {
     const intervalId = setInterval(checkConnection, 3000);
     fetchUserData();
     return () => clearInterval(intervalId);
-  }, [userService, isConnected]);
+  }, [isConnected]);
 
   // Efecto para limpiar el mensaje de error después de 3 segundos
   useEffect(() => {

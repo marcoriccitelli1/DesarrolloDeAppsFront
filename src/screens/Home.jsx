@@ -64,7 +64,7 @@ const Home = () => {
     const intervalId = setInterval(checkConnection, 3000);
     fetchUnassignedOrders();
     return () => clearInterval(intervalId);
-  }, [orderService, isConnected]);
+  }, [isConnected]);
 
   const renderContent = () => {
     if (loading && !refreshing) {

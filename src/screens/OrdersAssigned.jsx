@@ -39,7 +39,7 @@ const OrdersAssigned = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [orderService]);
+  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
