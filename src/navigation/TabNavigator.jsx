@@ -51,7 +51,7 @@ const TabNavigator = () => {
         name="HomeTab"
         component={Home}
         options={{
-          tabBarLabel: 'Inicio',
+          tabBarLabel: 'Pedidos',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -61,7 +61,7 @@ const TabNavigator = () => {
         name="OrdersAssignedTab"
         component={OrdersAssigned}
         options={{
-          tabBarLabel: 'Pedidos',
+          tabBarLabel: 'Mis Pedidos',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="list-outline" size={size} color={color} />
           ),

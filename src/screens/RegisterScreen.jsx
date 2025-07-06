@@ -16,6 +16,7 @@ import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import { useAxios } from '../hooks/useAxios';
 import { Ionicons } from '@expo/vector-icons';
+import CustomModal from '../components/CustomModal';
 
 
 const RegisterScreen = ({ navigation }) => {
@@ -27,6 +28,7 @@ const RegisterScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   
   const axios = useAxios();
 
@@ -102,14 +104,7 @@ const RegisterScreen = ({ navigation }) => {
         phone,
       });
 
-      Alert.alert(
-        'Registro Exitoso',
-        'Te hemos enviado un correo de verificación. Por favor, verifica tu correo electrónico antes de iniciar sesión.',
-        [{ 
-          text: 'OK',
-          onPress: () => navigation.navigate('Login')
-        }]
-      );
+      setShowSuccessModal(true);
 
     } catch (err) {
       console.error('Error en registro:', err);
@@ -211,6 +206,15 @@ const RegisterScreen = ({ navigation }) => {
             <Text style={styles.loginLink}>¿Ya tenés cuenta? Iniciar sesión</Text>
           </Pressable>
         </View>
+        <CustomModal
+          visible={showSuccessModal}
+          message="Te hemos enviado un correo de verificación. Por favor, verifica tu correo electrónico antes de iniciar sesión."
+          onAccept={() => {
+            setShowSuccessModal(false);
+            navigation.navigate('Login');
+          }}
+          acceptText="OK"
+        />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

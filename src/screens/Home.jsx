@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, StatusBar, RefreshControl } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import UnassignedOrderCard from '../components/UnassignedOrderCard';
+import ErrorDisplay from '../components/ErrorDisplay';
 import { useOrderService } from '../services/orderService';
+import EmptyStateDisplay from '../components/EmptyStateDisplay';
 
 const Home = () => {
   const [orders, setOrders] = useState([]);
@@ -77,25 +79,16 @@ const Home = () => {
     
 
     if (error) {
-      return (
-        <View style={styles.fullScreenCenter}>
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorIcon}>⚠️</Text>
-            <Text style={styles.error}>{error}</Text>
-          </View>
-        </View>
-      );
+      return <ErrorDisplay error={error} />;
     }
 
     if (!loading && orders.length === 0) {
       return (
-        <View style={styles.fullScreenCenter}>
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>📦</Text>
-            <Text style={styles.text}>No hay pedidos sin asignar</Text>
-            <Text style={styles.subText}>Los pedidos aparecerán aquí cuando estén disponibles</Text>
-          </View>
-        </View>
+        <EmptyStateDisplay
+          icon="📦"
+          mainMessage="No hay pedidos sin asignar"
+          subMessage="Los pedidos aparecerán aquí cuando estén disponibles"
+        />
       );
     }
 
@@ -117,7 +110,7 @@ const Home = () => {
     >
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Pedidos sin Asignar</Text>
+          <Text style={styles.headerTitle}>Pedidos</Text>
         </View>
         <ScrollView 
           style={styles.center}
@@ -193,29 +186,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  error: {
-    color: '#E74C3C',
-    fontSize: 16,
-    marginTop: 12,
-    textAlign: 'center',
-    lineHeight: 22,
-    fontWeight: '500',
-  },
-  errorContainer: {
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#FDF2F1',
-    borderRadius: 12,
-    width: '90%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
+
   emptyContainer: {
     alignItems: 'center',
     padding: 24,
@@ -231,10 +202,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-  errorIcon: {
-    fontSize: 40,
-    marginBottom: 16,
-  },
+
   emptyIcon: {
     fontSize: 40,
     marginBottom: 16,

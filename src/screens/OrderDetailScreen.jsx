@@ -1,11 +1,13 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CustomButton from '../components/CustomButton';
 import CustomModal from '../components/CustomModal';
 import { useAxios } from '../hooks/useAxios';
 import { AuthContext } from '../context/AuthContext';
+import { useOrderService } from '../services/orderService';
+import { openGoogleMaps } from '../services/routeService';
 
 const DetailItem = ({ icon, label, value }) => (
   <View style={styles.item}>
@@ -20,29 +22,18 @@ const OrderDetailScreen = ({ route, navigation }) => {
   const insets = useSafeAreaInsets();
   const axios = useAxios();
   const { user } = useContext(AuthContext);
+  const orderService = useOrderService();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState('');
   const [modalError, setModalError] = useState('');
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [cancelResultModal, setCancelResultModal] = useState({ visible: false, message: '' });
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [successModal, setSuccessModal] = useState({ visible: false, message: '' });
 
-  const openGoogleMaps = () => {
-    const location = order.destino;
-    const encodedLocation = encodeURIComponent(location);
-    const url = Platform.select({
-      ios: `maps:0,0?q=${encodedLocation}`,
-      android: `geo:0,0?q=${encodedLocation}`
-    });
-
-    Linking.canOpenURL(url)
-      .then(supported => {
-        if (supported) {
-          return Linking.openURL(url);
-        } else {
-          const browserUrl = `https://www.google.com/maps/search/?api=1&query=${encodedLocation}`;
-          return Linking.openURL(browserUrl);
-        }
-      })
-      .catch(err => console.error('Error al abrir Google Maps:', err));
+  const handleOpenGoogleMaps = () => {
+    openGoogleMaps(order.destino);
   };
   
   const handleFinalizeOrder = async () => {
@@ -63,9 +54,10 @@ const OrderDetailScreen = ({ route, navigation }) => {
       
       if (response.data.success) {
         setModalVisible(false);
-        Alert.alert("Éxito", response.data.message || "El pedido ha sido finalizado correctamente.", [
-          { text: "OK", onPress: () => navigation.goBack() }
-        ]);
+        setSuccessModal({ 
+          visible: true, 
+          message: response.data.message || "El pedido ha sido finalizado correctamente." 
+        });
       } else {
         setModalError(response.data.message || 'Error al finalizar el pedido.');
       }
@@ -89,6 +81,26 @@ const OrderDetailScreen = ({ route, navigation }) => {
     setConfirmationCode('');
     setModalError(''); 
     setModalVisible(true);
+  };
+
+  const handleCancelOrder = async () => {
+    setCancelLoading(true);
+    try {
+      const result = await orderService.cancelOrder(order.id);
+      setCancelModalVisible(false);
+      setCancelResultModal({ visible: true, message: result.message });
+      if (result.success) {
+        setTimeout(() => {
+          setCancelResultModal({ visible: false, message: '' });
+          navigation.goBack();
+        }, 1500);
+      }
+    } catch (err) {
+      setCancelModalVisible(false);
+      setCancelResultModal({ visible: true, message: 'Error al cancelar el pedido.' });
+    } finally {
+      setCancelLoading(false);
+    }
   };
 
   return (
@@ -120,10 +132,17 @@ const OrderDetailScreen = ({ route, navigation }) => {
         <View style={styles.footer}>
           <CustomButton
             title="Ver Ruta en Maps"
-            onPress={openGoogleMaps}
+            onPress={handleOpenGoogleMaps}
             style={styles.mapsButton}
             textStyle={styles.buttonText}
             icon={<MaterialCommunityIcons name="map-marker" size={20} color="#fff" />}
+          />
+          <CustomButton
+            title="Cancelar Entrega"
+            onPress={() => setCancelModalVisible(true)}
+            style={styles.cancelButton}
+            textStyle={styles.buttonText}
+            icon={<MaterialCommunityIcons name="close-circle" size={20} color="#fff" />}
           />
           <CustomButton
             title="Finalizar Pedido"
@@ -154,6 +173,33 @@ const OrderDetailScreen = ({ route, navigation }) => {
           cancelText="Cancelar"
           showCancelButton={true}
           errorText={modalError}
+        />
+        <CustomModal
+          visible={cancelModalVisible}
+          message="¿Desea cancelar la entrega?"
+          onAccept={handleCancelOrder}
+          onCancel={() => setCancelModalVisible(false)}
+          acceptText={cancelLoading ? 'Cancelando...' : 'Aceptar'}
+          cancelText="Cancelar"
+          showCancelButton={true}
+          disableAccept={cancelLoading}
+        />
+        <CustomModal
+          visible={cancelResultModal.visible}
+          message={cancelResultModal.message}
+          onAccept={() => setCancelResultModal({ visible: false, message: '' })}
+          acceptText="OK"
+          showCancelButton={false}
+        />
+        <CustomModal
+          visible={successModal.visible}
+          message={successModal.message}
+          onAccept={() => {
+            setSuccessModal({ visible: false, message: '' });
+            navigation.goBack();
+          }}
+          acceptText="OK"
+          showCancelButton={false}
         />
       </View>
     </View>
@@ -270,6 +316,10 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     marginLeft: 10,
+  },
+  cancelButton: {
+    backgroundColor: '#E74C3C',
+    marginBottom: 12,
   },
 });
 

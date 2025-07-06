@@ -135,11 +135,31 @@ export const useOrderService = () => {
     }
   };
 
+  // Cancelar un pedido
+  const cancelOrder = async (orderId) => {
+    try {
+      const response = await axios.post('/orders/cancelOrder', { orderId });
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        ...response.data
+      };
+    } catch (err) {
+      return {
+        success: false,
+        ...handleApiError(err, {
+          default: 'Error al cancelar el pedido.'
+        })
+      };
+    }
+  };
+
   return {
     getUnassignedOrders,
     getAssignedOrders,
     getOrdersRecord,
     checkConnection,
+    cancelOrder,
     handleApiError
   };
 }; 

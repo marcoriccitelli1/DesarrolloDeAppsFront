@@ -3,7 +3,13 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, StatusBar, Refresh
 import { useOrderService } from '../services/orderService';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { openAllRoutes } from '../services/routeService';
+
 import AssignedOrderCard from '../components/AssignedOrderCard';
+import ErrorDisplay from '../components/ErrorDisplay';
+import EmptyStateDisplay from '../components/EmptyStateDisplay';
+import CustomButton from '../components/CustomButton';
 
 const OrdersAssigned = () => {
   const [orders, setOrders] = useState([]);
@@ -63,6 +69,10 @@ const OrdersAssigned = () => {
     navigation.navigate('OrderDetail', { order });
   };
 
+  const handleOpenAllRoutes = () => {
+    openAllRoutes(orders);
+  };
+
   const renderContent = () => {
     console.log('Estado actual - loading:', loading, 'refreshing:', refreshing, 'orders.length:', orders.length, 'error:', error);
     
@@ -75,25 +85,16 @@ const OrdersAssigned = () => {
     }
 
     if (error) {
-      return (
-        <View style={styles.fullScreenCenter}>
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorIcon}>⚠️</Text>
-            <Text style={styles.error}>{error}</Text>
-          </View>
-        </View>
-      );
+      return <ErrorDisplay error={error} />;
     }
 
     if (!loading && orders.length === 0) {
       return (
-        <View style={styles.fullScreenCenter}>
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>📦</Text>
-            <Text style={styles.text}>Todavía no hay pedidos asignados</Text>
-            <Text style={styles.subText}>Los pedidos aparecerán aquí cuando sean asignados a tu cuenta</Text>
-          </View>
-        </View>
+        <EmptyStateDisplay
+          icon="📦"
+          mainMessage="Todavía no hay pedidos asignados"
+          subMessage="Los pedidos aparecerán aquí cuando sean asignados a tu cuenta"
+        />
       );
     }
 
@@ -125,12 +126,12 @@ const OrdersAssigned = () => {
       />
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Pedidos Asignados</Text>
+          <Text style={styles.headerTitle}>Mis Pedidos</Text>
         </View>
         <ScrollView
           contentContainerStyle={[
             styles.scrollContentContainer,
-            { paddingBottom: insets.bottom + 20 }
+            { paddingBottom: (insets.bottom || 16) + 100 }
           ]}
           refreshControl={
             <RefreshControl
@@ -143,6 +144,29 @@ const OrdersAssigned = () => {
         >
           {renderContent()}
         </ScrollView>
+        {orders.length > 0 && (
+          <View style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: (insets.bottom || 16) + 60,
+            backgroundColor: 'transparent',
+            alignItems: 'center',
+            padding: 12,
+            zIndex: 100,
+            pointerEvents: 'box-none'
+          }}>
+            <View style={{ width: '90%' }}>
+              <CustomButton
+                title="Ver Ruta de todos los pedidos"
+                onPress={handleOpenAllRoutes}
+                style={{ backgroundColor: '#4285F4' }}
+                textStyle={{ color: '#fff', fontWeight: 'bold' }}
+                icon={<MaterialCommunityIcons name="map-marker" size={20} color="#fff" />}
+              />
+            </View>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -202,29 +226,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  error: {
-    color: '#E74C3C',
-    fontSize: 16,
-    marginTop: 12,
-    textAlign: 'center',
-    lineHeight: 22,
-    fontWeight: '500',
-  },
-  errorContainer: {
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#FDF2F1',
-    borderRadius: 12,
-    width: '90%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
+
   emptyContainer: {
     alignItems: 'center',
     padding: 24,
@@ -240,10 +242,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-  errorIcon: {
-    fontSize: 40,
-    marginBottom: 16,
-  },
+
   emptyIcon: {
     fontSize: 40,
     marginBottom: 16,

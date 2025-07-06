@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useUserService } from '../services/userService';
 import CustomModal from '../components/CustomModal';
+import ErrorDisplay from '../components/ErrorDisplay';
 
 const Profile = () => {
   const [userData, setUserData] = useState({ name: 'Cargando...', email: 'Cargando...' });
@@ -119,14 +120,7 @@ const Profile = () => {
     }
 
     if (error) {
-      return (
-        <View style={styles.fullScreenCenter}>
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorIcon}>⚠️</Text>
-            <Text style={styles.error}>{error}</Text>
-          </View>
-        </View>
-      );
+      return <ErrorDisplay error={error} />;
     }
 
     return (
@@ -292,33 +286,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  error: {
-    color: '#E74C3C',
-    fontSize: 16,
-    marginTop: 12,
-    textAlign: 'center',
-    lineHeight: 22,
-    fontWeight: '500',
-  },
-  errorContainer: {
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#FDF2F1',
-    borderRadius: 12,
-    width: '90%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  errorIcon: {
-    fontSize: 40,
-    marginBottom: 16,
-  },
+
   fullScreenCenter: {
     flex: 1,
     justifyContent: 'center',
