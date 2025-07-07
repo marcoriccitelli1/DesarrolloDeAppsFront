@@ -18,7 +18,26 @@ export const useQRCodeService = () => {
     }
   };
 
+  // Nueva función para tomar pedido por QR
+  const takeOrderByQr = async (orderId) => {
+    try {
+      const response = await axiosInstance.post(`/orders/takeOrder/${orderId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      let errorMessage = 'Error al procesar el pedido';
+      if (error.response) {
+        errorMessage = error.response.data?.message || 'Error al procesar el pedido';
+      } else if (error.request) {
+        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+      } else {
+        errorMessage = error.message || 'Error desconocido';
+      }
+      return { success: false, error: errorMessage };
+    }
+  };
+
   return {
-    processQRCode
+    processQRCode,
+    takeOrderByQr
   };
 };

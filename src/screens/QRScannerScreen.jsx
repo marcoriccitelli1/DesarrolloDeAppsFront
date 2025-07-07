@@ -17,7 +17,7 @@ const QRScannerScreen = ({ navigation }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const scannedRef = useRef(false); 
   const insets = useSafeAreaInsets();
-  const { takeOrder } = useQRCodeService();
+  const { takeOrderByQr } = useQRCodeService();
   const axios = useAxios();
   const { user } = useContext(AuthContext);
 
@@ -47,26 +47,15 @@ const QRScannerScreen = ({ navigation }) => {
     scannedRef.current = true;
     setLoading(true);
 
-    try {
-      const response = await axios.post(`/orders/takeOrder/${data}`);
+    const result = await takeOrderByQr(data);
 
+    if (result.success) {
       setShowSuccessModal(true);
-    } catch (error) {
-      let errorMessage = 'Error al procesar el pedido';
-      
-      if (error.response) {
-        errorMessage = error.response.data?.message || 'Error al procesar el pedido';
-      } else if (error.request) {
-        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
-      } else {
-        errorMessage = error.message || 'Error desconocido';
-      }
-
-      setErrorMessage(errorMessage);
+    } else {
+      setErrorMessage(result.error);
       setShowErrorModal(true);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   if (!permission) {
