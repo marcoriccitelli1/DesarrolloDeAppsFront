@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Alert, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
   StatusBar,
   ActivityIndicator,
   RefreshControl,
@@ -35,9 +35,7 @@ const Profile = () => {
     try {
       setLoading(true);
       setError(null);
-      
       const result = await userService.getUserProfile();
-      
       if (result.success) {
         setUserData(result.data);
         setIsConnected(true);
@@ -48,7 +46,6 @@ const Profile = () => {
         }
       }
     } catch (err) {
-
       setError('Error al cargar los datos del perfil');
     } finally {
       setLoading(false);
@@ -73,17 +70,14 @@ const Profile = () => {
           }
         }
       } catch (err) {
-
         setIsConnected(false);
       }
     };
-
     const intervalId = setInterval(checkConnection, 3000);
     fetchUserData();
     return () => clearInterval(intervalId);
   }, [isConnected]);
 
-  // Efecto para limpiar el mensaje de error después de 3 segundos
   useEffect(() => {
     let timeoutId;
     if (error) {
@@ -105,9 +99,7 @@ const Profile = () => {
   const handleConfirmLogout = async () => {
     try {
       await logout();
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
 
   const renderContent = () => {
@@ -118,13 +110,10 @@ const Profile = () => {
         </View>
       );
     }
-
     if (error) {
       return <ErrorDisplay error={error} />;
     }
-
     return (
-      
       <View style={styles.contentContainer}>
         <View style={styles.optionContent}>
           <Ionicons name="person-outline" size={24} color="#6c4eb6" />
@@ -139,12 +128,10 @@ const Profile = () => {
           </Pressable>
         </View>
         <View style={styles.optionsContainer}>
-          <Pressable 
+          <Pressable
             style={styles.option}
             onPress={() => {
-
               navigation.navigate('ChangePassword');
-
             }}
           >
             <View style={styles.optionContent}>
@@ -161,12 +148,11 @@ const Profile = () => {
           </Pressable>
         </View>
       </View>
-     
     );
   };
 
   return (
-    <View 
+    <View
       style={[
         styles.mainContainer,
         { paddingTop: insets.top }
@@ -174,15 +160,15 @@ const Profile = () => {
     >
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
-          <Pressable 
-            style={styles.backButton} 
+          <Pressable
+            style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="chevron-back" size={28} color="#fff" />
           </Pressable>
           <Text style={styles.headerTitle}>Tu Perfil</Text>
         </View>
-        <ScrollView 
+        <ScrollView
           style={styles.center}
           contentContainerStyle={styles.scrollContent}
           refreshControl={
@@ -197,7 +183,6 @@ const Profile = () => {
           {renderContent()}
         </ScrollView>
       </View>
-
       <CustomModal
         visible={showLogoutModal}
         message="¿Estás seguro que deseas cerrar sesión?"
@@ -286,7 +271,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   fullScreenCenter: {
     flex: 1,
     justifyContent: 'center',

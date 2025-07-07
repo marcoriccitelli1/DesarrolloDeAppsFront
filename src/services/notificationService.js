@@ -111,7 +111,6 @@ export function isNotificationServiceRunning() {
 // Función para forzar la detección de cambios cuando se complete/cancele un pedido
 export async function checkForImmediateUpdates() {
   try {
-    console.log('[Notification] Verificando actualizaciones inmediatas...');
     const response = await checkForOrderUpdates();
     if (response.success) {
       // Notificar cambios de estado inmediatamente
@@ -124,7 +123,6 @@ export async function checkForImmediateUpdates() {
           }
         }
       }
-      
       // Notificar cambios de ubicación inmediatamente
       if (response.data.locationChanges && response.data.locationChanges.length > 0) {
         for (const change of response.data.locationChanges) {
@@ -142,7 +140,6 @@ async function checkForOrderUpdates() {
   try {
     const token = await getToken();
     if (!token) return { success: false, data: null };
-    
     const res = await fetch(`${config.API_BASE_URL}/orders/notifications`, {
       method: 'GET',
       headers: {
@@ -151,79 +148,44 @@ async function checkForOrderUpdates() {
       },
     });
     const data = await res.json();
-    
-    // Debug: Log de la respuesta del backend
-    console.log('[Notification] Respuesta del backend:', JSON.stringify(data, null, 2));
-    
     const statusChanges = [];
     const locationChanges = [];
-    
     // Procesar pedidos asignados para detectar cambios de estado
     if (data.assignedOrders && Array.isArray(data.assignedOrders)) {
-      console.log('[Notification] Procesando', data.assignedOrders.length, 'pedidos asignados');
-      
       for (const pedido of data.assignedOrders) {
         const orderId = pedido.id;
         const currentState = pedido.estado;
         const currentLocation = pedido.destino;
         const previousState = lastOrderStates.get(orderId);
         const previousLocation = lastOrderLocations.get(orderId);
-        
-        // Debug: Log de cada pedido
-        console.log(`[Notification] Pedido ${orderId}:`, {
-          currentState,
-          previousState: previousState || 'PRIMERA_VEZ',
-          currentLocation,
-          previousLocation: previousLocation || 'PRIMERA_VEZ'
-        });
-        
         // Si es la primera vez que vemos este pedido, solo guardar el estado actual
         if (!previousState) {
-          console.log(`[Notification] Primera vez viendo pedido ${orderId}, guardando estado: ${currentState}`);
           lastOrderStates.set(orderId, currentState);
           lastOrderLocations.set(orderId, currentLocation);
           continue; // Saltar a la siguiente iteración
         }
-        
         // Verificar cambios de estado
         if (previousState === 'En curso' && currentState === 'entregado') {
-          console.log(`[Notification] ¡Cambio detectado! Pedido ${orderId} entregado`);
           statusChanges.push({ type: 'delivered', orderId });
         } else if (previousState === 'En curso' && currentState === 'no entregado') {
-          console.log(`[Notification] ¡Cambio detectado! Pedido ${orderId} cancelado`);
           statusChanges.push({ type: 'cancelled', orderId });
-        } else if (previousState !== currentState) {
-          console.log(`[Notification] Cambio de estado detectado: ${previousState} → ${currentState} para pedido ${orderId}`);
         }
-        
         // Verificar cambios de ubicación
         if (previousLocation && currentLocation && previousLocation !== currentLocation) {
-          console.log(`[Notification] ¡Cambio de ubicación detectado! Pedido ${orderId}`);
-          locationChanges.push({ 
-            type: 'location_changed', 
-            orderId, 
+          locationChanges.push({
+            type: 'location_changed',
+            orderId,
             newLocation: currentLocation,
-            previousLocation: previousLocation 
+            previousLocation: previousLocation
           });
         }
-        
         // Actualizar el estado y ubicación actual para la próxima verificación
         lastOrderStates.set(orderId, currentState);
         lastOrderLocations.set(orderId, currentLocation);
       }
     }
-    
     // Verificar si hay nuevos pedidos sin asignar
     const hasNewOrders = data.unassignedOrders && data.unassignedOrders.length > 0;
-    
-    console.log('[Notification] Resumen de cambios:', {
-      statusChanges: statusChanges.length,
-      locationChanges: locationChanges.length,
-      hasNewOrders,
-      totalAssigned: data.assignedOrders?.length || 0,
-      totalUnassigned: data.totalUnassigned || 0
-    });
-    
     return {
       success: true,
       data: {
@@ -235,7 +197,6 @@ async function checkForOrderUpdates() {
         message: `Tienes ${data.totalUnassigned || 0} pedidos nuevos para despachar.`
       }
     };
-    
   } catch (error) {
     console.error('[Notification] Error en checkForOrderUpdates:', error);
     return { success: false, data: null };

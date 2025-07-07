@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
   StatusBar,
@@ -29,10 +29,8 @@ const ForgotPasswordScreen = ({ navigation }) => {
       setError('Por favor ingresa tu correo electrónico');
       return;
     }
-
     setError('');
     setLoading(true);
-
     try {
       await axios.post('/auth/changePassword', { email });
       setShowSuccessModal(true);
@@ -43,7 +41,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
     } catch (err) {
       console.error('Error al solicitar recuperación de contraseña:', err);
       setError(
-        err.response?.data?.error || 
+        err.response?.data?.error ||
         'Error al enviar el correo de recuperación. Por favor, intenta nuevamente.'
       );
     } finally {
@@ -53,7 +51,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View 
+      <View
         style={[
           styles.mainContainer,
           { paddingTop: insets.top, paddingBottom: insets.bottom }
@@ -94,7 +92,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
             />
           </View>
         </View>
-
         <CustomModal
           visible={showSuccessModal}
           message="Se ha enviado un correo con instrucciones para recuperar tu contraseña"
@@ -150,7 +147,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 10,
   },
-
   errorText: {
     color: '#ff3b30',
     fontSize: 14,

@@ -19,9 +19,7 @@ const Home = () => {
     try {
       setLoading(true);
       setError(null);
-      
       const result = await orderService.getUnassignedOrders();
-      
       if (result.success) {
         setOrders(result.data);
         setIsConnected(true);
@@ -62,7 +60,6 @@ const Home = () => {
         setIsConnected(false);
       }
     };
-
     const intervalId = setInterval(checkConnection, 3000);
     fetchUnassignedOrders();
     return () => clearInterval(intervalId);
@@ -76,12 +73,9 @@ const Home = () => {
         </View>
       );
     }
-    
-
     if (error) {
       return <ErrorDisplay error={error} />;
     }
-
     if (!loading && orders.length === 0) {
       return (
         <EmptyStateDisplay
@@ -91,7 +85,6 @@ const Home = () => {
         />
       );
     }
-
     return (
       <View style={{ flex: 1 }}>
         {orders.map((item) => (
@@ -102,17 +95,17 @@ const Home = () => {
   };
 
   return (
-    <View 
+    <View
       style={[
         styles.mainContainer,
         { paddingTop: insets.top }
       ]}
     >
-      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Pedidos</Text>
-        </View>
-        <ScrollView 
+      <View style={[styles.container, { paddingBottom: insets.bottom }]}> 
+        <View style={styles.header}> 
+          <Text style={styles.headerTitle}>Pedidos</Text> 
+        </View> 
+        <ScrollView
           style={styles.center}
           contentContainerStyle={styles.scrollContent}
           refreshControl={
@@ -186,7 +179,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-
   emptyContainer: {
     alignItems: 'center',
     padding: 24,
@@ -202,7 +194,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-
   emptyIcon: {
     fontSize: 40,
     marginBottom: 16,

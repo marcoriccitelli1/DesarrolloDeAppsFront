@@ -24,22 +24,18 @@ const OrdersAssigned = () => {
     setLoading(true);
     setError(null);
     try {
-   
       const result = await orderService.getAssignedOrders();
-      
       if (result.success) {
-
         setOrders(result.data);
       } else {
         if (result.status === 404) {
           setOrders([]);
-          setError(null); // No es un error, sino un estado vacío
+          setError(null);
         } else {
           setError(result.error);
         }
       }
     } catch (err) {
-
       setError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
     } finally {
       setLoading(false);
@@ -56,12 +52,9 @@ const OrdersAssigned = () => {
     navigation.setOptions({
       gestureEnabled: false
     });
-
     const unsubscribe = navigation.addListener('focus', () => {
-
       fetchOrders();
     });
-
     return unsubscribe;
   }, [navigation, fetchOrders]);
 
@@ -74,8 +67,6 @@ const OrdersAssigned = () => {
   };
 
   const renderContent = () => {
-
-    
     if (loading && !refreshing) {
       return (
         <View style={styles.loadingContainer}>
@@ -83,11 +74,9 @@ const OrdersAssigned = () => {
         </View>
       );
     }
-
     if (error) {
       return <ErrorDisplay error={error} />;
     }
-
     if (!loading && orders.length === 0) {
       return (
         <EmptyStateDisplay
@@ -97,7 +86,6 @@ const OrdersAssigned = () => {
         />
       );
     }
-
     return (
       <View style={styles.listContainer}>
         {orders.map((order) => (
@@ -112,8 +100,7 @@ const OrdersAssigned = () => {
   };
 
   return (
-    
-    <View 
+    <View
       style={[
         styles.mainContainer,
         { paddingTop: insets.top }
@@ -225,7 +212,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-
   emptyContainer: {
     alignItems: 'center',
     padding: 24,
@@ -241,7 +227,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-
   emptyIcon: {
     fontSize: 40,
     marginBottom: 16,

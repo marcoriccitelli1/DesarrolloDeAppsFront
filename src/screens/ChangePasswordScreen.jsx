@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
+import {
+  View,
+  Text,
   StyleSheet,
   SafeAreaView,
   StatusBar,
@@ -33,17 +33,14 @@ const ChangePasswordScreen = () => {
       setErrorMessage('Por favor completa todos los campos');
       return false;
     }
-
     if (newPassword !== confirmPassword) {
       setErrorMessage('Las contraseñas nuevas no coinciden');
       return false;
     }
-
     if (newPassword.length < 8) {
       setErrorMessage('La contraseña debe tener al menos 8 caracteres');
       return false;
     }
-
     return true;
   };
 
@@ -57,7 +54,6 @@ const ChangePasswordScreen = () => {
     setErrorMessage('');
     try {
       const result = await userService.changePassword(currentPassword, newPassword);
-
       if (result.success) {
         Alert.alert(
           'Éxito',
@@ -82,7 +78,7 @@ const ChangePasswordScreen = () => {
   };
 
   return (
-    <View 
+    <View
       style={[
         styles.mainContainer,
         { paddingTop: insets.top, paddingBottom: insets.bottom }
@@ -94,8 +90,8 @@ const ChangePasswordScreen = () => {
       />
       <View style={styles.container}>
         <View style={styles.header}>
-          <Pressable 
-            style={styles.backButton} 
+          <Pressable
+            style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="chevron-back" size={28} color="#6c4eb6" />
@@ -153,7 +149,6 @@ const ChangePasswordScreen = () => {
           disabled={loading}
         />
       </View>
-
       <CustomModal
         visible={showConfirmModal}
         message="¿Estás seguro que deseas cambiar tu contraseña?"
@@ -171,7 +166,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f6fa'
   },
-
   safeAreaTop: {
     flex: 0,
     backgroundColor: '#f9f6fa'

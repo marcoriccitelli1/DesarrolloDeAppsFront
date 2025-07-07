@@ -16,8 +16,6 @@ import CustomButton from '../components/CustomButton';
 import { AuthContext } from '../context/AuthContext';
 import { useAuthService } from '../services/authService';
 
-
-
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,30 +25,22 @@ const LoginScreen = ({ navigation }) => {
   const authService = useAuthService();
   const insets = useSafeAreaInsets();
 
-
-
   const handleLogin = async () => {
     if (!email || !password) {
       setError('Por favor completa todos los campos');
       return;
     }
-    
     setError('');
     setLoading(true);
-    
     try {
-
       const result = await authService.login(email, password);
-      
       if (result.success) {
-
         const { token } = result.data;
         await login(token);
       } else {
         setError(result.error);
       }
     } catch (err) {
-
       setError('Error al intentar iniciar sesión');
     } finally {
       setLoading(false);
@@ -58,7 +48,7 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <View 
+    <View
       style={[
         styles.safeArea,
         { paddingTop: insets.top }
@@ -97,17 +87,17 @@ const LoginScreen = ({ navigation }) => {
                 editable={!loading}
               />
             </View>
-            <CustomButton 
-              title="Iniciar Sesión" 
+            <CustomButton
+              title="Iniciar Sesión"
               onPress={handleLogin}
-              disabled={loading} 
+              disabled={loading}
             />
-            <CustomButton 
-              title="Crear Cuenta" 
+            <CustomButton
+              title="Crear Cuenta"
               onPress={() => navigation.navigate('Register')}
               disabled={loading}
             />
-            <Pressable 
+            <Pressable
               onPress={() => !loading && navigation.navigate('ForgotPassword')}
             >
               <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>

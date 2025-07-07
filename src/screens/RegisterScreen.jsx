@@ -18,7 +18,6 @@ import { useAxios } from '../hooks/useAxios';
 import { Ionicons } from '@expo/vector-icons';
 import CustomModal from '../components/CustomModal';
 
-
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,7 +28,6 @@ const RegisterScreen = ({ navigation }) => {
   const [emailError, setEmailError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  
   const axios = useAxios();
 
   // Validamos mail en tiempo real
@@ -52,32 +50,27 @@ const RegisterScreen = ({ navigation }) => {
       setError('Todos los campos son obligatorios');
       return false;
     }
-
     // validacion para el email
     if (emailError) {
       setError(emailError);
       return false;
     }
-
     // Validamos contraseña con minimo de 8 caracteres
     if (password.length < 8) {
       setError('La contraseña debe tener al menos 8 caracteres');
       return false;
     }
-
     // Validamos que las contraseñas coincidan
     if (password !== repeatPassword) {
       setError('Las contraseñas no coinciden');
       return false;
     }
-
     // Validamos minimo 8 digitos para el telefono
     const phoneRegex = /^\d{8,}$/;
     if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
       setError('Por favor ingresa un número de teléfono válido (mínimo 8 dígitos)');
       return false;
     }
-
     return true;
   };
 
@@ -90,16 +83,13 @@ const RegisterScreen = ({ navigation }) => {
         setLoading(false);
         return;
       }
-
       await axios.post('/auth/register', {
         email,
         password,
         name: fullName.trim(),
         phone,
       });
-
       setShowSuccessModal(true);
-
     } catch (err) {
       console.error('Error en registro:', err);
       if (err.response?.status === 409) {
@@ -113,7 +103,6 @@ const RegisterScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView 
