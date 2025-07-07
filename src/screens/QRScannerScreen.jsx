@@ -143,7 +143,7 @@ const QRScannerScreen = ({ navigation }) => {
       {/* Modal de éxito */}
       <CustomModal
         visible={showSuccessModal}
-        message="El pedido ha sido asignado y marcado como entregado correctamente."
+        message="El pedido ha sido tomado correctamente."
         acceptText="Aceptar"
         onAccept={() => {
           setShowSuccessModal(false);

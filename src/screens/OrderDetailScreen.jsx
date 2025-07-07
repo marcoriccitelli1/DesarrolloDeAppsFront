@@ -8,6 +8,7 @@ import { useAxios } from '../hooks/useAxios';
 import { AuthContext } from '../context/AuthContext';
 import { useOrderService } from '../services/orderService';
 import { openGoogleMaps } from '../services/routeService';
+import { checkForImmediateUpdates } from '../services/notificationService';
 
 const DetailItem = ({ icon, label, value }) => (
   <View style={styles.item}>
@@ -58,6 +59,10 @@ const OrderDetailScreen = ({ route, navigation }) => {
           visible: true, 
           message: response.data.message || "El pedido ha sido finalizado correctamente." 
         });
+        
+        setTimeout(() => {
+          checkForImmediateUpdates();
+        }, 1000);
       } else {
         setModalError(response.data.message || 'Error al finalizar el pedido.');
       }
@@ -90,6 +95,10 @@ const OrderDetailScreen = ({ route, navigation }) => {
       setCancelModalVisible(false);
       setCancelResultModal({ visible: true, message: result.message });
       if (result.success) {
+        setTimeout(() => {
+          checkForImmediateUpdates();
+        }, 1000);
+        
         setTimeout(() => {
           setCancelResultModal({ visible: false, message: '' });
           navigation.goBack();

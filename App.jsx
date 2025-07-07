@@ -20,7 +20,7 @@ function AppContent() {
       await configureNotifications();
       const granted = await requestNotificationPermissions();
       if (granted) {
-        startPeriodicNotifications(1); // cada 1 minuto
+        startPeriodicNotifications(1/6); // cada 1 minuto
       }
     }
     setupNotifications();
