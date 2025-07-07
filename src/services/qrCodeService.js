@@ -13,7 +13,6 @@ export const useQRCodeService = () => {
         message: 'QR code processed successfully'
       };
     } catch (error) {
-      console.error('Error processing QR code:', error);
       throw error;
     }
   };

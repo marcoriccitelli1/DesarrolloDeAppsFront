@@ -91,7 +91,6 @@ const RegisterScreen = ({ navigation }) => {
       });
       setShowSuccessModal(true);
     } catch (err) {
-      console.error('Error en registro:', err);
       if (err.response?.status === 409) {
         setError('Este correo electrónico ya está registrado');
       } else if (err.response?.data?.error) {

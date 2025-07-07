@@ -5,8 +5,6 @@ export const useOrderService = () => {
 
   // Función centralizada para manejar errores de red y otros errores
   const handleApiError = (err, customMessages = {}) => {
-    console.error('Error en API:', err);
-    
     if (err.message === 'Network Error' || err.code === 'ECONNABORTED') {
       return {
         error: 'No hay conexión a internet. Por favor, verifica tu conexión.',

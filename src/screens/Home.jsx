@@ -30,7 +30,6 @@ const Home = () => {
         }
       }
     } catch (err) {
-      console.error('Error inesperado:', err);
       setError('Error al cargar los pedidos sin asignar');
     } finally {
       setLoading(false);
@@ -56,7 +55,6 @@ const Home = () => {
           }
         }
       } catch (err) {
-        console.error('Error checking connection:', err);
         setIsConnected(false);
       }
     };

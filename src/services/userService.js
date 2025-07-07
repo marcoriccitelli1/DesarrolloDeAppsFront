@@ -5,8 +5,6 @@ export const useUserService = () => {
 
   // Función centralizada para manejar errores de usuario
   const handleUserError = (err, customMessages = {}) => {
-    console.error('Error en operación de usuario:', err);
-    
     if (err.message === 'Network Error' || err.code === 'ECONNABORTED') {
       return {
         error: 'No hay conexión a internet. Por favor, verifica tu conexión.',
@@ -118,8 +116,6 @@ export const useUserService = () => {
           isConnected: false
         };
       }
-      // Otros errores sí pueden loguearse si se desea
-      // console.error('Error en checkConnection:', err);
       return {
         success: false,
         isConnected: false

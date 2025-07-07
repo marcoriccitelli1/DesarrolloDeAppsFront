@@ -20,7 +20,7 @@ export const openGoogleMaps = (location) => {
         return Linking.openURL(browserUrl);
       }
     })
-    .catch(err => console.error('Error al abrir Google Maps:', err));
+    .catch(() => {});
 };
 
 /**

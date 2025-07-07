@@ -39,7 +39,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
         navigation.navigate('Login');
       }, 2000);
     } catch (err) {
-      console.error('Error al solicitar recuperación de contraseña:', err);
       setError(
         err.response?.data?.error ||
         'Error al enviar el correo de recuperación. Por favor, intenta nuevamente.'

@@ -69,7 +69,6 @@ const ChangePasswordScreen = () => {
         setErrorMessage(result.error);
       }
     } catch (error) {
-      console.error('Error inesperado:', error);
       setErrorMessage('Error al cambiar la contraseña');
     } finally {
       setLoading(false);

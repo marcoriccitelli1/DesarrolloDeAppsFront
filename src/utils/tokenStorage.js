@@ -24,7 +24,6 @@ export const saveToken = async (token) => {
   try {
     await storage.setItemAsync('jwt', token);
   } catch (error) {
-    console.error('Error saving token:', error);
     if (isWeb) {
       localStorage.setItem('jwt', token);
     }
@@ -35,7 +34,6 @@ export const getToken = async () => {
   try {
     return await storage.getItemAsync('jwt');
   } catch (error) {
-    console.error('Error getting token:', error);
     if (isWeb) {
       return localStorage.getItem('jwt');
     }
@@ -47,7 +45,6 @@ export const removeToken = async () => {
   try {
     await storage.deleteItemAsync('jwt');
   } catch (error) {
-    console.error('Error removing token:', error);
     if (isWeb) {
       localStorage.removeItem('jwt');
     }

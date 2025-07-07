@@ -40,7 +40,6 @@ const OrdersRecord = () => {
         }
       }
     } catch (err) {
-      console.error('Error inesperado:', err);
       setError('Error al cargar el historial de pedidos');
     } finally {
       setLoading(false);
@@ -66,7 +65,6 @@ const OrdersRecord = () => {
           }
         }
       } catch (err) {
-        console.error('Error checking connection:', err);
         setIsConnected(false);
       }
     };

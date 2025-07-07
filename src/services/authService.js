@@ -5,8 +5,6 @@ export const useAuthService = () => {
 
   // Función centralizada para manejar errores de autenticación
   const handleAuthError = (err) => {
-    console.error('Error en autenticación:', err);
-    
     if (err.message === 'Network Error' || err.code === 'ECONNABORTED') {
       return {
         error: 'No hay conexión a internet. Por favor, verifica tu conexión.',
