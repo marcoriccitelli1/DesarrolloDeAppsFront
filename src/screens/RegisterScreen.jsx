@@ -32,7 +32,7 @@ const RegisterScreen = ({ navigation }) => {
   
   const axios = useAxios();
 
-  // Validar email en tiempo real
+  // Validamos mail en tiempo real
   useEffect(() => {
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,37 +47,31 @@ const RegisterScreen = ({ navigation }) => {
   }, [email]);
 
   const validateForm = () => {
-    // Validar campos vacíos
+    // validacion para todos los campos esten completos 
     if (!fullName || !email || !password || !repeatPassword || !phone) {
       setError('Todos los campos son obligatorios');
       return false;
     }
 
-    // Validar nombre (no vacío)
-    if (fullName.trim().length === 0) {
-      setError('Por favor ingresa tu nombre');
-      return false;
-    }
-
-    // Validar email
+    // validacion para el email
     if (emailError) {
       setError(emailError);
       return false;
     }
 
-    // Validar contraseña
+    // Validamos contraseña con minimo de 8 caracteres
     if (password.length < 8) {
       setError('La contraseña debe tener al menos 8 caracteres');
       return false;
     }
 
-    // Validar que las contraseñas coincidan
+    // Validamos que las contraseñas coincidan
     if (password !== repeatPassword) {
       setError('Las contraseñas no coinciden');
       return false;
     }
 
-    // Validar teléfono (al menos 8 dígitos)
+    // Validamos minimo 8 digitos para el telefono
     const phoneRegex = /^\d{8,}$/;
     if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
       setError('Por favor ingresa un número de teléfono válido (mínimo 8 dígitos)');

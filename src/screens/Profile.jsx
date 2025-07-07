@@ -48,7 +48,7 @@ const Profile = () => {
         }
       }
     } catch (err) {
-      console.error('Error inesperado:', err);
+
       setError('Error al cargar los datos del perfil');
     } finally {
       setLoading(false);
@@ -73,7 +73,7 @@ const Profile = () => {
           }
         }
       } catch (err) {
-        console.error('Error checking connection:', err);
+
         setIsConnected(false);
       }
     };
@@ -106,7 +106,7 @@ const Profile = () => {
     try {
       await logout();
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+
     }
   };
 
@@ -142,9 +142,9 @@ const Profile = () => {
           <Pressable 
             style={styles.option}
             onPress={() => {
-              console.log('Intentando navegar a ChangePassword');
+
               navigation.navigate('ChangePassword');
-              console.log('Navegación completada');
+
             }}
           >
             <View style={styles.optionContent}>

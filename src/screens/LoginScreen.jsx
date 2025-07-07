@@ -16,7 +16,7 @@ import CustomButton from '../components/CustomButton';
 import { AuthContext } from '../context/AuthContext';
 import { useAuthService } from '../services/authService';
 
-console.log("LoginScreen: renderizando componente");
+
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -27,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
   const authService = useAuthService();
   const insets = useSafeAreaInsets();
 
-  console.log("LoginScreen: login del contexto:", login);
+
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -39,18 +39,18 @@ const LoginScreen = ({ navigation }) => {
     setLoading(true);
     
     try {
-      console.log("LoginScreen: intentando login con", email);
+
       const result = await authService.login(email, password);
       
       if (result.success) {
-        console.log("LoginScreen: respuesta del backend:", result.data);
+
         const { token } = result.data;
         await login(token);
       } else {
         setError(result.error);
       }
     } catch (err) {
-      console.log("LoginScreen: error inesperado:", err);
+
       setError('Error al intentar iniciar sesión');
     } finally {
       setLoading(false);

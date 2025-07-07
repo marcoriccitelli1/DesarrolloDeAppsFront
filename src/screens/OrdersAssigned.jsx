@@ -24,11 +24,11 @@ const OrdersAssigned = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log('Haciendo petición a /orders/getAssignedOrders...');
+   
       const result = await orderService.getAssignedOrders();
       
       if (result.success) {
-        console.log('Pedidos procesados:', result.data);
+
         setOrders(result.data);
       } else {
         if (result.status === 404) {
@@ -39,7 +39,7 @@ const OrdersAssigned = () => {
         }
       }
     } catch (err) {
-      console.error('Error inesperado en fetchOrders:', err);
+
       setError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
     } finally {
       setLoading(false);
@@ -58,7 +58,7 @@ const OrdersAssigned = () => {
     });
 
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log("La pantalla ha ganado foco, actualizando pedidos...");
+
       fetchOrders();
     });
 
@@ -74,7 +74,7 @@ const OrdersAssigned = () => {
   };
 
   const renderContent = () => {
-    console.log('Estado actual - loading:', loading, 'refreshing:', refreshing, 'orders.length:', orders.length, 'error:', error);
+
     
     if (loading && !refreshing) {
       return (
@@ -98,7 +98,6 @@ const OrdersAssigned = () => {
       );
     }
 
-    console.log('Renderizando pedidos:', orders);
     return (
       <View style={styles.listContainer}>
         {orders.map((order) => (

@@ -68,7 +68,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
       }
   
     } catch (error) {
-      console.log('Error completo al finalizar:', JSON.stringify(error, null, 2));
+
       let displayMessage = 'Ocurrió un error inesperado.';
   
       if (error.response) {
@@ -82,7 +82,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
   }; 
   
   const openConfirmationModal = () => {
-    console.log("Botón 'Finalizar Pedido' presionado. Abriendo modal de confirmación...");
+
     setConfirmationCode('');
     setModalError(''); 
     setModalVisible(true);
