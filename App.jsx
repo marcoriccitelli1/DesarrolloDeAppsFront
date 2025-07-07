@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,11 +8,23 @@ import AppNavigator from './src/navigation/AppNavigator';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
+import { configureNotifications, requestNotificationPermissions, startPeriodicNotifications } from './src/services/notificationService';
 
 const Stack = createNativeStackNavigator();
 
 function AppContent() {
   const { isAuthenticated } = useContext(AuthContext);
+
+  useEffect(() => {
+    async function setupNotifications() {
+      await configureNotifications();
+      const granted = await requestNotificationPermissions();
+      if (granted) {
+        startPeriodicNotifications(1); // cada 1 minuto
+      }
+    }
+    setupNotifications();
+  }, []);
 
   if (isAuthenticated === null) {
     return null;
